@@ -58,4 +58,41 @@ class TestController extends Controller
         }
         print_r($data);
     }
+
+    public function geojson(Request $request)
+    {
+        $south = $request->input('south'); // lat
+        $north = $request->input('north'); // lat
+        $east = $request->input('east'); // lon
+        $west = $request->input('west'); // lon
+
+        $data = Place::where([
+            ['lat', '>=', $south],
+            ['lat', '<=', $north],
+            ['lon', '>=', $west],
+            ['lon', '<=', $east]
+        ])->get();
+
+        $geoJSON = [
+            'type' => 'FeatureCollection',
+            'features' => []
+        ];
+
+        foreach ($data as $item) {
+            $geoJSON['features'][] = [
+                'id' => $item->id,
+                'type' => 'Feature',
+                'properties' => [
+                    'title' => $item->title
+                ],
+                'geometry' => [
+                    'type' => 'Point',
+                    'coordinates' => [$item->lon, $item->lat]
+                ]
+            ];
+        }
+
+        echo json_encode($geoJSON);
+
+    }
 }

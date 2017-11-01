@@ -12,6 +12,7 @@
 */
 
 Route::get('/test', 'TestController@fetch');
+Route::post('/geojson', 'TestController@geojson');
 
 Route::get('/', function () {
     return view('welcome');
