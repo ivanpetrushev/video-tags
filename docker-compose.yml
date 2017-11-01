@@ -1,0 +1,47 @@
+version: '2'
+services:
+    db:
+        image: mysql
+        ports:
+            - "3307:3306"
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: laravel
+            MYSQL_USER: laravel
+            MYSQL_PASSWORD: laravel
+    php:
+        build: ./php-fpm
+        expose:
+            - "9000"
+        tty: true
+        volumes:
+            - ./laravel:/var/www/laravel
+        links:
+            - db
+    nginx:
+        build: ./nginx
+        ports:
+            - "8002:80"
+        links:
+            - php
+        volumes_from:
+            - php
+        volumes:
+            - ./logs/nginx/:/var/log/nginx
+    myadmin:
+        image: phpmyadmin/phpmyadmin
+        container_name: phpmyadmintest
+        ports:
+            - 8181:80
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: laravel
+            MYSQL_USER: laravel
+            MYSQL_PASSWORD: laravel
+            PMA_HOST: db
+        depends_on:
+            - db
+    cron:
+        build: ./cron
+        volumes_from:
+            - php

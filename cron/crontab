@@ -1,0 +1,3 @@
+# m h  dom mon dow   command
+*/5 * * * * cd /var/www/laravel; /usr/bin/php bin/console app:echo >>/tmp/cronz.log
+
