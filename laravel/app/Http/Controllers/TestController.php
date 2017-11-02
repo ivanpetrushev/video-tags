@@ -83,7 +83,8 @@ class TestController extends Controller
                 'id' => $item->id,
                 'type' => 'Feature',
                 'properties' => [
-                    'title' => $item->title
+                    'title' => $item->title,
+                    'is_visited' => $item->is_visited
                 ],
                 'geometry' => [
                     'type' => 'Point',
