@@ -38,4 +38,22 @@ $(document).ready(function () {
             }
         }
     }).addTo(mymap);
+
+    // load sidebar
+    $.ajax({
+        url: '/geojson',
+        method: 'post',
+        data: {
+            north: 90,
+            south: -90,
+            east: 180,
+            west: -180
+        },
+        dataType: 'json',
+        success: function(data){
+            for (var i in data.features) {
+                $('.list-group').append('<a href="#" class="list-group-item small">' + data.features[i].properties.title + '</a>')
+            }
+        }
+    })
 })

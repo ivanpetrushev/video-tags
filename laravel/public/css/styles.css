@@ -2,4 +2,19 @@ html, body {
     height: 100%;
 }
 
-#mapid { height: 90%; }
+#mapid {
+    height: 100%;
+    width: 90%;
+}
+
+#sidebar {
+    width: 250px;
+    height: 100%;
+    overflow: scroll;
+}
+
+.wrapper {
+    display: flex;
+    align-items: stretch;
+    height: 100%;
+}
