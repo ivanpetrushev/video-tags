@@ -2,6 +2,12 @@ html, body {
     height: 100%;
 }
 
+.wrapper {
+    display: flex;
+    align-items: stretch;
+    height: 100%;
+}
+
 #mapid {
     height: 100%;
     width: 90%;
@@ -13,8 +19,15 @@ html, body {
     overflow: scroll;
 }
 
-.wrapper {
-    display: flex;
-    align-items: stretch;
-    height: 100%;
+.list-group-item {
+    background-repeat: no-repeat;
+    background-size: 20px;
+    background-position-y: center;
+    padding-left: 26px;
+}
+.list-group-item.visited {
+    background-image: url(https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png);
+}
+.list-group-item.not-visited {
+    background-image: url(https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png);
 }

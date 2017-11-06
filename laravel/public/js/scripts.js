@@ -52,7 +52,13 @@ $(document).ready(function () {
         dataType: 'json',
         success: function(data){
             for (var i in data.features) {
-                $('.list-group').append('<a href="#" class="list-group-item small">' + data.features[i].properties.title + '</a>')
+                var tag = $('<a href="#" class="list-group-item small">' + data.features[i].properties.title + '</a>');
+                if (data.features[i].properties.is_visited) {
+                    tag.addClass('visited');
+                } else {
+                    tag.addClass('not-visited');
+                }
+                $('.list-group').append(tag)
             }
         }
     })
