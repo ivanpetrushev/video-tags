@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css"
           integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ=="
           crossorigin=""/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="/css/styles.css?ts=<?= time() ?>"/>
 </head>
 <body>
@@ -15,6 +16,14 @@
     <div class="list-group" id="sidebar">
         <span href="#" class="list-group-item active">
             Интересни места
+        </span>
+        <span href="#" class="list-group-item search">
+            <div class="input-group input-group-unstyled">
+                <input type="text" class="form-control" />
+                <span class="input-group-addon">
+                    <i class="fa fa-search"></i>
+                </span>
+            </div>
         </span>
 
     </div>

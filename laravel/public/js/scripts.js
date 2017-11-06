@@ -62,7 +62,7 @@ $(document).ready(function () {
         dataType: 'json',
         success: function(data){
             for (var i in data.features) {
-                var tag = $('<a href="#" class="list-group-item small">' + data.features[i].properties.title + '</a>');
+                var tag = $('<a href="#" class="list-group-item small place">' + data.features[i].properties.title + '</a>');
                 tag.attr('data-id', data.features[i].properties.id);
                 tag.attr('data-lat', data.features[i].geometry.coordinates[1]);
                 tag.attr('data-lon', data.features[i].geometry.coordinates[0]);
@@ -76,7 +76,7 @@ $(document).ready(function () {
         }
     })
 
-    $('body').on('click', '.list-group-item', function(e) {
+    $('body').on('click', '.list-group-item.place', function(e) {
         e.preventDefault();
         e.stopPropagation();
 
@@ -86,5 +86,16 @@ $(document).ready(function () {
 
         mymap.panTo([lat, lon]);
         mymap.fireEvent('dragend');
+    })
+
+    $('.search input').on('keyup', function(e){
+        var val = $(this).val();
+        $('.place').each(function() {
+            $(this).removeClass('hidden');
+
+            if (! $(this).html().match(val)) {
+                $(this).addClass('hidden');
+            }
+        })
     })
 })
