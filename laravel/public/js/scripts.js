@@ -1,4 +1,6 @@
 $(document).ready(function () {
+    var openPopupId = null;
+
     var mymap = L.map('mapid').setView([42.48112, 25.48645], 13);
     L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
@@ -26,9 +28,17 @@ $(document).ready(function () {
     L.uGeoJSONLayer({
         endpoint: '/geojson',
         onEachFeature: function (feature, layer) {
-            if (feature.properties && feature.properties.title) {
-                layer.bindPopup(feature.properties.title);
+            if (feature.properties) {
+                layer.bindPopup(feature.properties.title).openPopup();
             }
+        },
+        after: function(data) {
+            mymap.eachLayer(function(layer) {
+                if (layer.feature && openPopupId && layer.feature.properties.id == openPopupId) {
+                    layer.openPopup();
+                    openPopupId = null;
+                }
+            })
         },
         pointToLayer: function (feature, latlng) {
             if (feature.properties.is_visited) {
@@ -53,6 +63,9 @@ $(document).ready(function () {
         success: function(data){
             for (var i in data.features) {
                 var tag = $('<a href="#" class="list-group-item small">' + data.features[i].properties.title + '</a>');
+                tag.attr('data-id', data.features[i].properties.id);
+                tag.attr('data-lat', data.features[i].geometry.coordinates[1]);
+                tag.attr('data-lon', data.features[i].geometry.coordinates[0]);
                 if (data.features[i].properties.is_visited) {
                     tag.addClass('visited');
                 } else {
@@ -61,5 +74,17 @@ $(document).ready(function () {
                 $('.list-group').append(tag)
             }
         }
+    })
+
+    $('body').on('click', '.list-group-item', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        var lat = $(this).data('lat');
+        var lon = $(this).data('lon');
+        openPopupId = $(this).data('id');
+
+        mymap.panTo([lat, lon]);
+        mymap.fireEvent('dragend');
     })
 })

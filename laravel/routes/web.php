@@ -11,8 +11,8 @@
 |
 */
 
-Route::get('/test', 'TestController@fetch');
-Route::post('/geojson', 'TestController@geojson');
+Route::get('/test', 'PlacesController@fetch');
+Route::post('/geojson', 'PlacesController@geojson');
 
 Route::get('/', function () {
     return view('welcome');

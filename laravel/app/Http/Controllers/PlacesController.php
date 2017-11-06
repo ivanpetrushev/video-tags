@@ -8,7 +8,7 @@ use App\PlaceLink;
 use DB;
 use XmlParser;
 
-class TestController extends Controller
+class PlacesController extends Controller
 {
     protected $mid = '1x-5deLW-Xs6Q0YRPqfzUZU3FXdo';
     protected $iconVisited = '#icon-61';
@@ -83,6 +83,7 @@ class TestController extends Controller
                 'id' => $item->id,
                 'type' => 'Feature',
                 'properties' => [
+                    'id' => $item->id,
                     'title' => $item->title,
                     'is_visited' => $item->is_visited
                 ],
