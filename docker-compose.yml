@@ -18,16 +18,24 @@ services:
             - ./laravel:/var/www/laravel
         links:
             - db
-    nginx:
-        build: ./nginx
+    apache:
+        image: smtripat/apache-php-fpm:latest
         ports:
-            - "8002:80"
-        links:
-            - php
-        volumes_from:
-            - php
+          - 8003:80
         volumes:
-            - ./logs/nginx/:/var/log/nginx
+          - ./apache2/logs/:/var/log/apache2
+          - ./laravel:/var/www/html/docroot
+          - ./apache2/sites-enabled/:/etc/apache2/sites-enabled
+#    nginx:
+#        build: ./nginx
+#        ports:
+#            - "8002:80"
+#        links:
+#            - php
+#        volumes_from:
+#            - php
+#        volumes:
+#            - ./logs/nginx/:/var/log/nginx
     myadmin:
         image: phpmyadmin/phpmyadmin
         container_name: phpmyadmintest
