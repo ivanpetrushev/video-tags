@@ -23,14 +23,14 @@ class CreatePlaces extends Migration
             $table->increments('id');
             $table->timestamps();
             $table->string('title', 255)->default('');
-            $table->unsignedInteger('category_id');
+            $table->unsignedInteger('category_id')->nullable();
             $table->decimal('lat', 9, 6);
             $table->decimal('lon', 9, 6);
             $table->text('description');
             $table->boolean('is_visited')->default(0);
 
             $table->index('category_id');
-            $table->foreign('category_id')->references('id')->on('places_categories');
+            $table->foreign('category_id')->references('id')->on('places_categories')->onDelete('cascade');
         });
 
         Schema::create('places_links', function (Blueprint $table) {
@@ -42,7 +42,7 @@ class CreatePlaces extends Migration
             $table->boolean('is_blog')->default(0);
 
             $table->index('place_id');
-            $table->foreign('place_id')->references('id')->on('places');
+            $table->foreign('place_id')->references('id')->on('places')->onDelete('cascade');
         });
     }
 

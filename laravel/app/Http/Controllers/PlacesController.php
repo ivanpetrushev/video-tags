@@ -37,7 +37,7 @@ class PlacesController extends Controller
             $oRecord->title = $item['name'];
             $oRecord->description = $item['description'] ?? '';
             $oRecord->is_visited = (bool) (strstr($item['styleUrl'], $this->iconVisited));
-            $oRecord->category_id = 1;
+            $oRecord->category_id = null;
 
             $coordinates = trim($item['Point']['coordinates']);
             $coordinates = explode(',', $coordinates);

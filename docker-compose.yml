@@ -4,6 +4,8 @@ services:
         image: mysql
         ports:
             - "3307:3306"
+        volumes:
+           - ./db:/var/lib/mysql/
         environment:
             MYSQL_ROOT_PASSWORD: root
             MYSQL_DATABASE: laravel
@@ -38,7 +40,6 @@ services:
 #            - ./logs/nginx/:/var/log/nginx
     myadmin:
         image: phpmyadmin/phpmyadmin
-        container_name: phpmyadmintest
         ports:
             - 8181:80
         environment:
