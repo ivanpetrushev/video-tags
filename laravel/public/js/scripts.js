@@ -25,11 +25,20 @@ $(document).ready(function () {
         shadowSize: [41, 41]
     });
 
+    var fnGeneratePopup = function(layer) {
+        var props = layer.feature.properties;
+        var popup = $('<div>', {class: 'popup'});
+        popup.append($('<div>', {class: 'title'}).html(props.title));
+        popup.append($('<div>', {class: 'description'}).html(props.description));
+
+        return popup.html();
+    }
+
     L.uGeoJSONLayer({
         endpoint: '/geojson',
         onEachFeature: function (feature, layer) {
             if (feature.properties) {
-                layer.bindPopup(feature.properties.title).openPopup();
+                layer.bindPopup(fnGeneratePopup).openPopup();
             }
         },
         after: function(data) {
@@ -62,14 +71,19 @@ $(document).ready(function () {
         dataType: 'json',
         success: function(data){
             for (var i in data.features) {
-                var tag = $('<a href="#" class="list-group-item small place">' + data.features[i].properties.title + '</a>');
-                tag.attr('data-id', data.features[i].properties.id);
-                tag.attr('data-lat', data.features[i].geometry.coordinates[1]);
-                tag.attr('data-lon', data.features[i].geometry.coordinates[0]);
-                if (data.features[i].properties.is_visited) {
+                var feature = data.features[i];
+                var tag = $('<a href="#" class="list-group-item small place">' + feature.properties.title + '</a>');
+                tag.attr('data-id', feature.properties.id);
+                tag.attr('data-lat', feature.geometry.coordinates[1]);
+                tag.attr('data-lon', feature.geometry.coordinates[0]);
+                if (feature.properties.is_visited) {
                     tag.addClass('visited');
                 } else {
                     tag.addClass('not-visited');
+                }
+
+                if (feature.properties.description != '') {
+                    tag.append('<i class="fa fa-fw fa-comment"></i>');
                 }
                 $('.list-group').append(tag)
             }
@@ -85,7 +99,10 @@ $(document).ready(function () {
         openPopupId = $(this).data('id');
 
         mymap.panTo([lat, lon]);
-        mymap.fireEvent('dragend');
+        setTimeout(function(){
+            mymap.fireEvent('dragend');
+        }, 500);
+
     })
 
     $('.search input').on('keyup', function(e){

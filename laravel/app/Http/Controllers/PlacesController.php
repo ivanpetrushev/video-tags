@@ -85,7 +85,8 @@ class PlacesController extends Controller
                 'properties' => [
                     'id' => $item->id,
                     'title' => $item->title,
-                    'is_visited' => $item->is_visited
+                    'is_visited' => $item->is_visited,
+                    'description' => $item->description
                 ],
                 'geometry' => [
                     'type' => 'Point',
