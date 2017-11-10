@@ -13,4 +13,9 @@ class Place extends Model
     {
         return $this->hasMany('App\PlaceLink', 'place_id');
     }
+
+    public function categories()
+    {
+        return $this->hasMany('App\PlaceCategory', 'place_id');
+    }
 }

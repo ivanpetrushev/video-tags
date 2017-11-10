@@ -38,7 +38,6 @@ class PlacesService {
 
             $oRecord->title = $item['name'];
             $oRecord->is_visited = (bool) (strstr($item['styleUrl'], $this->iconVisited));
-            $oRecord->category_id = null;
 
             $description = preg_replace('/\<br(\s*)?\/?\>/i', "\n", $item['description']);
             $description = strip_tags($description);

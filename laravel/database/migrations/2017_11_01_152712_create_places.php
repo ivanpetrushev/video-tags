@@ -13,7 +13,7 @@ class CreatePlaces extends Migration
      */
     public function up()
     {
-        Schema::create('places_categories', function (Blueprint $table) {
+        Schema::create('categories', function (Blueprint $table) {
             $table->increments('id');
             $table->string('title', 255)->default('');
             $table->string('icon', 255)->default('');
@@ -23,14 +23,21 @@ class CreatePlaces extends Migration
             $table->increments('id');
             $table->timestamps();
             $table->string('title', 255)->default('');
-            $table->unsignedInteger('category_id')->nullable();
             $table->decimal('lat', 9, 6);
             $table->decimal('lon', 9, 6);
             $table->text('description');
             $table->boolean('is_visited')->default(0);
+        });
 
+        Schema::create('places_categories', function (Blueprint $table) {
+            $table->increments('id');
+            $table->unsignedInteger('place_id');
+            $table->unsignedInteger('category_id');
+
+            $table->index('place_id');
+            $table->foreign('place_id')->references('id')->on('places')->onDelete('cascade');
             $table->index('category_id');
-            $table->foreign('category_id')->references('id')->on('places_categories')->onDelete('cascade');
+            $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
         });
 
         Schema::create('places_links', function (Blueprint $table) {
@@ -54,7 +61,8 @@ class CreatePlaces extends Migration
     public function down()
     {
         Schema::dropIfExists('places_links');
-        Schema::dropIfExists('places');
         Schema::dropIfExists('places_categories');
+        Schema::dropIfExists('places');
+        Schema::dropIfExists('categories');
     }
 }
