@@ -29,7 +29,25 @@ $(document).ready(function () {
         var props = layer.feature.properties;
         var popup = $('<div>', {class: 'popup'});
         popup.append($('<div>', {class: 'title'}).html(props.title));
+
+        var images = $('<div>', {class: 'images'});
+        for (var i in props.images) {
+            images.append($('<img>', {src: props.images[i].url, class: 'img-thumbnail'}));
+        }
+        popup.append(images);
+
         popup.append($('<div>', {class: 'description'}).html(props.description));
+
+        var blogs = $('<div>', {class: 'list-group blogs'});
+        for (var i in props.blogs) {
+            blogs.append($('<a>', {
+                href: props.blogs[i].url,
+                class: 'list-group-item list-group-item-action',
+                text: props.blogs[i].title,
+                target: '_blank'
+            }));
+        }
+        popup.append(blogs);
 
         return popup.html();
     }

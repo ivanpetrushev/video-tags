@@ -42,6 +42,20 @@ class PlacesController extends Controller
         ];
 
         foreach ($data as $item) {
+            $images = [];
+            $blogs = [];
+            $links = [];
+
+            foreach ($item->links as $link) {
+                if ($link->is_blog) {
+                    $blogs[] = $link;
+                } elseif ($link->title == 'image') {
+                    $images[] = $link;
+                } else {
+                    $links[] = $link;
+                }
+            }
+
             $geoJSON['features'][] = [
                 'id' => $item->id,
                 'type' => 'Feature',
@@ -49,7 +63,10 @@ class PlacesController extends Controller
                     'id' => $item->id,
                     'title' => $item->title,
                     'is_visited' => $item->is_visited,
-                    'description' => $item->description
+                    'description' => $item->description,
+                    'images' => $images,
+                    'blogs' => $blogs,
+                    'links' => $links,
                 ],
                 'geometry' => [
                     'type' => 'Point',

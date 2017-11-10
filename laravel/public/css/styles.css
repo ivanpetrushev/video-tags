@@ -42,4 +42,16 @@ html, body {
 .title {
     font-weight: bold;
     font-size: 1.2em;
+    text-align: center;
+}
+
+.leaflet-popup-content {
+    width: 340px;
+}
+.leaflet-popup-content .images {
+    text-align: center;
+}
+.leaflet-popup-content img {
+    max-width: 300px;
+    max-height: 240px;
 }

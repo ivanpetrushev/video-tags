@@ -103,12 +103,13 @@ class PlacesService {
 
         if (strlen($str) > 0) {
             $str = trim(preg_replace('/\s+/', ' ', $str)); // supports line breaks inside <title>
-            preg_match("/\<title\>(.*)\<\/title\>/i", $str, $title); // ignore case
-            $this->titleMap[$url] = $title[1];
+            preg_match("/\<title\>(.*)\<\/title\>/i", $str, $matches); // ignore case
+            $title = html_entity_decode($matches[1]);
+            $this->titleMap[$url] = $title;
 
             file_put_contents($filenameMap, serialize($this->titleMap));
 
-            return $title[1];
+            return $title;
         }
     }
 }
