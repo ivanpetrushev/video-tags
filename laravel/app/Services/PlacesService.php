@@ -48,6 +48,7 @@ class PlacesService
 
             $description = preg_replace('/\<br(\s*)?\/?\>/i', "\n", $item['description']);
             $description = strip_tags($description);
+            $description = str_replace("\xc2\xa0", '', $description); // remove non-breaking spaces %C2%A0
             preg_match_all('#\bhttps?://[^,\s()<>]+(?:\([\w\d]+\)|([^,[:punct:]\s]|/))#', $description, $matches);
             foreach ($matches[0] as $match) {
                 $description = str_replace($match, '', $description);
@@ -56,8 +57,8 @@ class PlacesService
 
             // get categories out of description
             $categoryIds = [];
-            if (preg_match('!> (.+?)$!', $description, $matches)) {
-                $categoryNames = explode(', ', $matches[1]);
+            if (preg_match('!>(.+?)$!ui', $description, $matches)) {
+                $categoryNames = explode(',', $matches[1]);
 
                 foreach ($categoryNames as $categoryName) {
                     $categoryIds[] = $this->resolveCategory($categoryName);
@@ -142,6 +143,7 @@ class PlacesService
 
     public function resolveCategory($name)
     {
+        $name = trim($name);
         if (!isset($this->categoryMap[$name])) {
             $category = new Category();
             $category->title = $name;
