@@ -4,17 +4,24 @@ namespace App\Services;
 
 use App\Place;
 use App\PlaceLink;
+use App\Category;
+use App\PlaceCategory;
+use DB;
 use XmlParser;
 
-class PlacesService {
+class PlacesService
+{
     protected $mid = '1x-5deLW-Xs6Q0YRPqfzUZU3FXdo';
     protected $iconVisited = '#icon-61';
     protected $iconNotVisited = '#icon-22';
 
     protected $titleMap = [];
+    protected $categoryMap = [];
 
     public function import()
     {
+        DB::table('categories')->delete();
+
         $sKmlSource = file_get_contents('https://www.google.com/maps/d/kml?forcekml=1&mid=' . $this->mid . '&nc=' . time());
         $sFilename = tempnam(sys_get_temp_dir(), 'laravel_');
         file_put_contents($sFilename, $sKmlSource);
@@ -27,7 +34,7 @@ class PlacesService {
 
         foreach ($data['placemarks'] as $item) {
             $oRecord = Place::where('title', $item['name'])->first();
-            if (! $oRecord) {
+            if (!$oRecord) {
                 $oRecord = new Place();
             }
 
@@ -37,7 +44,7 @@ class PlacesService {
             }
 
             $oRecord->title = $item['name'];
-            $oRecord->is_visited = (bool) (strstr($item['styleUrl'], $this->iconVisited));
+            $oRecord->is_visited = (bool)(strstr($item['styleUrl'], $this->iconVisited));
 
             $description = preg_replace('/\<br(\s*)?\/?\>/i', "\n", $item['description']);
             $description = strip_tags($description);
@@ -46,6 +53,18 @@ class PlacesService {
                 $description = str_replace($match, '', $description);
                 $urls[] = $match;
             }
+
+            // get categories out of description
+            $categoryIds = [];
+            if (preg_match('!> (.+?)$!', $description, $matches)) {
+                $categoryNames = explode(', ', $matches[1]);
+
+                foreach ($categoryNames as $categoryName) {
+                    $categoryIds[] = $this->resolveCategory($categoryName);
+                }
+                $description = strstr($description, $matches[0], '');
+            }
+
 
             $oRecord->description = trim($description);
 
@@ -64,7 +83,7 @@ class PlacesService {
                 $oRecordLink->place_id = $oRecord->id;
                 $oRecordLink->url = $url;
 
-                if (stristr($url,'googleusercontent')) {
+                if (stristr($url, 'googleusercontent')) {
                     $oRecordLink->title = 'image';
                 } elseif (stristr($url, 'blog.ivanatora.info')) {
                     $oRecordLink->title = $this->getTitle($url);
@@ -78,8 +97,17 @@ class PlacesService {
 
                 $oRecordLink->save();
             }
+
+            foreach ($categoryIds as $categoryId) {
+                $oRecordPlaceCategory = new PlaceCategory();
+                $oRecordPlaceCategory->place_id = $oRecord->id;
+                $oRecordPlaceCategory->category_id = $categoryId;
+                $oRecordPlaceCategory->save();
+            }
         }
-        print_r($data);
+
+        $this->calculateCategoryOccurencies();
+        print "\n\nDone\n";
     }
 
     public function getTitle($url)
@@ -88,7 +116,7 @@ class PlacesService {
 
         if (empty($this->titleMap) && file_exists($filenameMap)) {
             $mapSerialized = file_get_contents($filenameMap);
-            if (! empty($mapSerialized)) {
+            if (!empty($mapSerialized)) {
                 $this->titleMap = unserialize($mapSerialized);
             }
         }
@@ -109,6 +137,28 @@ class PlacesService {
             file_put_contents($filenameMap, serialize($this->titleMap));
 
             return $title;
+        }
+    }
+
+    public function resolveCategory($name)
+    {
+        if (!isset($this->categoryMap[$name])) {
+            $category = new Category();
+            $category->title = $name;
+            $category->save();
+
+            $this->categoryMap[$name] = $category->id;
+        }
+
+        return $this->categoryMap[$name];
+    }
+
+    public function calculateCategoryOccurencies()
+    {
+        $result = DB::table('places_categories')->selectRaw('category_id, COUNT(category_id) as cnt')->groupBy('category_id')->get();
+
+        foreach ($result as $row) {
+            Category::where('id', $row->category_id)->update(['num_occurencies' => $row->cnt]);
         }
     }
 }

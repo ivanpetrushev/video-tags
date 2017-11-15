@@ -25,8 +25,8 @@ services:
         ports:
           - 8003:80
         volumes:
-          - ./apache2/logs/:/var/log/apache2
           - ./laravel:/var/www/html/docroot
+          - ./apache2/logs/:/var/log/apache2
           - ./apache2/sites-enabled/:/etc/apache2/sites-enabled
 #    nginx:
 #        build: ./nginx

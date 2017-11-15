@@ -17,6 +17,7 @@ class CreatePlaces extends Migration
             $table->increments('id');
             $table->string('title', 255)->default('');
             $table->string('icon', 255)->default('');
+            $table->integer('num_occurencies')->default(0);
         });
 
         Schema::create('places', function (Blueprint $table) {
