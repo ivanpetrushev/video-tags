@@ -16,6 +16,9 @@
     <div class="list-group" id="sidebar">
         <span href="#" class="list-group-item active">
             Интересни места
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#search-form">
+                <span class="fa fa-reorder" aria-hidden="true"></span>
+            </button>
         </span>
         <span href="#" class="list-group-item search">
             <div class="input-group input-group-unstyled">
@@ -29,6 +32,26 @@
     </div>
 
     <div id="mapid"></div>
+</div>
+
+<div id="search-form" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Търсене</h4>
+            </div>
+            <div class="modal-body">
+                <h4>Категории</h4>
+                <div class="category-list row"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
 </div>
 
 

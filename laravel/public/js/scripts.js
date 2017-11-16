@@ -133,4 +133,19 @@ $(document).ready(function () {
             }
         })
     })
+
+    // load categories
+    $.ajax({
+        url: '/categories',
+        method: 'get',
+        dataType: 'json',
+        success: function(response){
+            if (response.success) {
+                for (var i in response.data) {
+                    var col = $('<div>', {class: 'col-md-3', html: response.data[i].title});
+                    $('.category-list').append(col);
+                }
+            }
+        }
+    })
 })

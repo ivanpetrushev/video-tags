@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Place;
 use App\PlaceLink;
+use App\Category;
 use DB;
 use App\Services\PlacesService;
 
@@ -76,6 +77,15 @@ class PlacesController extends Controller
         }
 
         echo json_encode($geoJSON);
+    }
 
+    public function categories()
+    {
+        $data = Category::orderBy('title', 'ASC')->get();
+
+        echo json_encode([
+            'success' => true,
+            'data' => $data
+        ]);
     }
 }
