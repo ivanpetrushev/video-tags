@@ -1,5 +1,7 @@
+var openPopupId = null;
+var filterCategories = {};
+
 $(document).ready(function () {
-    var openPopupId = null;
 
     var mymap = L.map('mapid').setView([42.48112, 25.48645], 13);
     L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -52,14 +54,55 @@ $(document).ready(function () {
         return popup.html();
     }
 
+    function fnLoadSidebar() {
+        $.ajax({
+            url: '/geojson',
+            method: 'post',
+            data: {
+                categories: JSON.stringify(filterCategories),
+                north: 90,
+                south: -90,
+                east: 180,
+                west: -180,
+            },
+            dataType: 'json',
+            success: function(data){
+                $('.search-items').empty();
+
+                for (var i in data.features) {
+                    var feature = data.features[i];
+                    var tag = $('<a href="#" class="list-group-item small place">' + feature.properties.title + '</a>');
+                    tag.attr('data-id', feature.properties.id);
+                    tag.attr('data-lat', feature.geometry.coordinates[1]);
+                    tag.attr('data-lon', feature.geometry.coordinates[0]);
+                    if (feature.properties.is_visited) {
+                        tag.addClass('visited');
+                    } else {
+                        tag.addClass('not-visited');
+                    }
+
+                    if (feature.properties.description != '') {
+                        tag.append('<i class="fa fa-fw fa-comment"></i>');
+                    }
+                    $('.search-items').append(tag)
+                }
+            }
+        })
+    }
+
     L.uGeoJSONLayer({
         endpoint: '/geojson',
+        parameters: {
+            filterCategories: function () {
+                return JSON.stringify(window.filterCategories)
+            }
+        },
         onEachFeature: function (feature, layer) {
             if (feature.properties) {
                 layer.bindPopup(fnGeneratePopup).openPopup();
             }
         },
-        after: function(data) {
+        after: function (data) {
             mymap.eachLayer(function(layer) {
                 if (layer.feature && openPopupId && layer.feature.properties.id == openPopupId) {
                     layer.openPopup();
@@ -77,36 +120,7 @@ $(document).ready(function () {
     }).addTo(mymap);
 
     // load sidebar
-    $.ajax({
-        url: '/geojson',
-        method: 'post',
-        data: {
-            north: 90,
-            south: -90,
-            east: 180,
-            west: -180
-        },
-        dataType: 'json',
-        success: function(data){
-            for (var i in data.features) {
-                var feature = data.features[i];
-                var tag = $('<a href="#" class="list-group-item small place">' + feature.properties.title + '</a>');
-                tag.attr('data-id', feature.properties.id);
-                tag.attr('data-lat', feature.geometry.coordinates[1]);
-                tag.attr('data-lon', feature.geometry.coordinates[0]);
-                if (feature.properties.is_visited) {
-                    tag.addClass('visited');
-                } else {
-                    tag.addClass('not-visited');
-                }
-
-                if (feature.properties.description != '') {
-                    tag.append('<i class="fa fa-fw fa-comment"></i>');
-                }
-                $('.list-group').append(tag)
-            }
-        }
-    })
+    fnLoadSidebar();
 
     $('body').on('click', '.list-group-item.place', function(e) {
         e.preventDefault();
@@ -160,5 +174,15 @@ $(document).ready(function () {
                 });
             }
         }
+    })
+
+    $('.do-filter').click(function(){
+        window.filterCategories = {};
+        $('#category-form input').each(function(x, el){
+            var name = $(el).attr('name');
+            window.filterCategories[name] = $(el).val();
+        })
+
+        fnLoadSidebar();
     })
 })

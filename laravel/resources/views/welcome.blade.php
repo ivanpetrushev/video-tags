@@ -28,6 +28,7 @@
                 </span>
             </div>
         </span>
+        <div class="search-items"></div>
 
     </div>
 
@@ -44,10 +45,12 @@
             </div>
             <div class="modal-body">
                 <h4>Категории</h4>
-                <div class="category-list row"></div>
+                <form id="category-form">
+                    <div class="category-list row"></div>
+                </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary">Филтрирай</button>
+                <button type="button" class="btn btn-primary do-filter">Филтрирай</button>
             </div>
         </div>
 
