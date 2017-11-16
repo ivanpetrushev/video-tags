@@ -55,3 +55,7 @@ html, body {
     max-width: 300px;
     max-height: 240px;
 }
+
+.tristate {
+    display: none;
+}

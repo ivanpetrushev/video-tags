@@ -47,7 +47,7 @@
                 <div class="category-list row"></div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Филтрирай</button>
             </div>
         </div>
 
@@ -66,6 +66,7 @@
         integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ"
         crossorigin="anonymous"></script>
 <script src="/js/leaflet.uGeoJSON.js"></script>
+<script src="/js/jquery.tristate.js"></script>
 <script src="/js/scripts.js?ts=<?= time() ?>"></script>
 </body>
 </html>

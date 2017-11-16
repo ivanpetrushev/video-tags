@@ -139,12 +139,25 @@ $(document).ready(function () {
         url: '/categories',
         method: 'get',
         dataType: 'json',
-        success: function(response){
+        success: function (response) {
             if (response.success) {
                 for (var i in response.data) {
-                    var col = $('<div>', {class: 'col-md-3', html: response.data[i].title});
+                    var col = $('<label>', {html: response.data[i].title, class: 'col-md-3'});
+                    var input = $('<input>', {type: 'checkbox', class: 'tristate', name: 'category-' +response.data[i].id});
+                    var img = $('<img>', {src: '/images/chk0.gif'});
+                    col.prepend(input);
+                    col.prepend(img);
                     $('.category-list').append(col);
                 }
+
+                $('.tristate').tristate({
+                    checked: '1',
+                    unchecked: '0',
+                    indeterminate: '2',
+                    change: function (state, value) {
+                        $(this).siblings('img').attr('src', '/images/chk' + value + '.gif');
+                    }
+                });
             }
         }
     })
