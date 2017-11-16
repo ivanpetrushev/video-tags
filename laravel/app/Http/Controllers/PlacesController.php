@@ -8,6 +8,7 @@ use App\PlaceLink;
 use App\Category;
 use DB;
 use App\Services\PlacesService;
+use Illuminate\Support\Facades\Log;
 
 class PlacesController extends Controller
 {
@@ -30,12 +31,29 @@ class PlacesController extends Controller
         $east = $request->input('east'); // lon
         $west = $request->input('west'); // lon
 
-        $data = Place::where([
+        $filters = $request->input('filterCategories', json_encode([]));
+        $filters = json_decode($filters, true);
+
+        $whereHas = $whereDoesntHave = [];
+        foreach ($filters as $name => $value) {
+            if (preg_match('/category-(\d+)$/', $name, $matches)) {
+                $catId = $matches[1];
+                if ($value == 1) {
+                    $whereHas[] = $catId;
+                } elseif ($value == 2) {
+                    $whereDoesntHave[] = $catId;
+                }
+            }
+        }
+
+        $query = Place::where([
             ['lat', '>=', $south],
             ['lat', '<=', $north],
             ['lon', '>=', $west],
             ['lon', '<=', $east]
-        ])->get();
+        ]);
+        $query->with('categories', 'categories.category');
+        $data = $query->get();
 
         $geoJSON = [
             'type' => 'FeatureCollection',
@@ -47,6 +65,41 @@ class PlacesController extends Controller
             $blogs = [];
             $links = [];
 
+            $categories = $item->categories;
+
+            if (! empty($whereHas)) {
+                $allowed = true;
+                foreach ($whereHas as $catId) {
+                    $categoryFound = false;
+                    foreach ($categories as $category) {
+                        if ($catId == $category->category_id) {
+                            $categoryFound = true;
+                        }
+                    }
+                    if (! $categoryFound) {
+                        $allowed = false;
+                        break;
+                    }
+                }
+                if (! $allowed) {
+                    continue;
+                }
+            }
+
+            if (! empty($whereDoesntHave)) {
+                $allowed = true;
+                foreach ($whereDoesntHave as $catId) {
+                    foreach ($categories as $category) {
+                        if ($catId == $category->category_id) {
+                            $allowed = false;
+                        }
+                    }
+                }
+                if (! $allowed) {
+                    continue;
+                }
+            }
+
             foreach ($item->links as $link) {
                 if ($link->is_blog) {
                     $blogs[] = $link;
@@ -55,6 +108,11 @@ class PlacesController extends Controller
                 } else {
                     $links[] = $link;
                 }
+            }
+
+            $categories = [];
+            foreach ($item->categories as $category) {
+                $categories[] = $category->category;
             }
 
             $geoJSON['features'][] = [
@@ -68,6 +126,7 @@ class PlacesController extends Controller
                     'images' => $images,
                     'blogs' => $blogs,
                     'links' => $links,
+                    'categories' => $categories
                 ],
                 'geometry' => [
                     'type' => 'Point',

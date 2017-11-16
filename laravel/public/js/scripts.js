@@ -59,7 +59,7 @@ $(document).ready(function () {
             url: '/geojson',
             method: 'post',
             data: {
-                categories: JSON.stringify(filterCategories),
+                filterCategories: JSON.stringify(filterCategories),
                 north: 90,
                 south: -90,
                 east: 180,
@@ -156,7 +156,10 @@ $(document).ready(function () {
         success: function (response) {
             if (response.success) {
                 for (var i in response.data) {
-                    var col = $('<label>', {html: response.data[i].title, class: 'col-md-3'});
+                    var col = $('<label>', {
+                        html: response.data[i].title + ' (' + response.data[i].num_occurencies + ')',
+                        class: 'col-md-3'
+                    });
                     var input = $('<input>', {
                         type: 'checkbox',
                         class: 'tristate',
