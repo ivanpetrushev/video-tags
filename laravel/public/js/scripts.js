@@ -27,7 +27,7 @@ $(document).ready(function () {
         shadowSize: [41, 41]
     });
 
-    var fnGeneratePopup = function(layer) {
+    var fnGeneratePopup = function (layer) {
         var props = layer.feature.properties;
         var popup = $('<div>', {class: 'popup'});
         popup.append($('<div>', {class: 'title'}).html(props.title));
@@ -66,7 +66,7 @@ $(document).ready(function () {
                 west: -180,
             },
             dataType: 'json',
-            success: function(data){
+            success: function (data) {
                 $('.search-items').empty();
 
                 for (var i in data.features) {
@@ -103,7 +103,7 @@ $(document).ready(function () {
             }
         },
         after: function (data) {
-            mymap.eachLayer(function(layer) {
+            mymap.eachLayer(function (layer) {
                 if (layer.feature && openPopupId && layer.feature.properties.id == openPopupId) {
                     layer.openPopup();
                     openPopupId = null;
@@ -122,7 +122,7 @@ $(document).ready(function () {
     // load sidebar
     fnLoadSidebar();
 
-    $('body').on('click', '.list-group-item.place', function(e) {
+    $('body').on('click', '.list-group-item.place', function (e) {
         e.preventDefault();
         e.stopPropagation();
 
@@ -131,18 +131,18 @@ $(document).ready(function () {
         openPopupId = $(this).data('id');
 
         mymap.panTo([lat, lon]);
-        setTimeout(function(){
+        setTimeout(function () {
             mymap.fireEvent('dragend');
         }, 500);
 
     })
 
-    $('.search input').on('keyup', function(e){
+    $('.search input').on('keyup', function (e) {
         var val = $(this).val();
-        $('.place').each(function() {
+        $('.place').each(function () {
             $(this).removeClass('hidden');
 
-            if (! $(this).html().match(val)) {
+            if (!$(this).html().toLowerCase().match(val.toLowerCase())) {
                 $(this).addClass('hidden');
             }
         })
@@ -157,7 +157,11 @@ $(document).ready(function () {
             if (response.success) {
                 for (var i in response.data) {
                     var col = $('<label>', {html: response.data[i].title, class: 'col-md-3'});
-                    var input = $('<input>', {type: 'checkbox', class: 'tristate', name: 'category-' +response.data[i].id});
+                    var input = $('<input>', {
+                        type: 'checkbox',
+                        class: 'tristate',
+                        name: 'category-' + response.data[i].id
+                    });
                     var img = $('<img>', {src: '/images/chk0.gif'});
                     col.prepend(input);
                     col.prepend(img);
@@ -176,9 +180,9 @@ $(document).ready(function () {
         }
     })
 
-    $('.do-filter').click(function(){
+    $('.do-filter').click(function () {
         window.filterCategories = {};
-        $('#category-form input').each(function(x, el){
+        $('#category-form input').each(function (x, el) {
             var name = $(el).attr('name');
             window.filterCategories[name] = $(el).val();
         })
