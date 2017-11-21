@@ -31,11 +31,25 @@ class PlacesController extends Controller
         $east = $request->input('east'); // lon
         $west = $request->input('west'); // lon
 
+        $where = [
+            ['lat', '>=', $south],
+            ['lat', '<=', $north],
+            ['lon', '>=', $west],
+            ['lon', '<=', $east]
+        ];
+
         $filters = $request->input('filterCategories', json_encode([]));
         $filters = json_decode($filters, true);
 
         $whereHas = $whereDoesntHave = [];
         foreach ($filters as $name => $value) {
+            if (preg_match('/only-visited/', $name, $matches)) {
+                if ($value == 1) {
+                    $where[] = ['is_visited', '=', 1];
+                } elseif ($value == 2) {
+                    $where[] = ['is_visited', '=', 0];
+                }
+            }
             if (preg_match('/category-(\d+)$/', $name, $matches)) {
                 $catId = $matches[1];
                 if ($value == 1) {
@@ -46,12 +60,7 @@ class PlacesController extends Controller
             }
         }
 
-        $query = Place::where([
-            ['lat', '>=', $south],
-            ['lat', '<=', $north],
-            ['lon', '>=', $west],
-            ['lon', '<=', $east]
-        ]);
+        $query = Place::where($where);
         $query->with('categories', 'categories.category');
         $data = $query->get();
 

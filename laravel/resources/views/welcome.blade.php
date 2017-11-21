@@ -44,8 +44,12 @@
                 <h4 class="modal-title">Търсене</h4>
             </div>
             <div class="modal-body">
-                <h4>Категории</h4>
                 <form id="category-form">
+                    <h4>Проверени</h4>
+                    <div class="row">
+                        <label class="col-md-3"> <img src="/images/chk0.gif"/><input type="checkbox" class="tristate" name="only-visited"/> Само проверени</label>
+                    </div>
+                    <h4>Категории</h4>
                     <div class="category-list row"></div>
                 </form>
             </div>
