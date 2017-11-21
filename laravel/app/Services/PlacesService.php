@@ -31,8 +31,17 @@ class PlacesService
             'placemarks' => ['uses' => 'Document.Folder.Placemark[name,description,styleUrl,Point.coordinates,ExtendedData.Data.value]']
         ]);
 
+        $idx = 0;
+        $cnt = count($data['placemarks']);
+        print "Importing $cnt placemarks...\n";
+
 
         foreach ($data['placemarks'] as $item) {
+            $idx++;
+            if ($idx % 20 == 0) {
+                print "$idx/$cnt done\r";
+            }
+
             $oRecord = Place::where('title', $item['name'])->first();
             if (!$oRecord) {
                 $oRecord = new Place();
@@ -108,7 +117,7 @@ class PlacesService
         }
 
         $this->calculateCategoryOccurencies();
-        print "\n\nDone\n";
+        print "\n\nAll done\n";
     }
 
     public function getTitle($url)
