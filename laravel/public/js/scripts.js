@@ -3,11 +3,13 @@ var filterCategories = {};
 
 $(document).ready(function () {
 
-    var mymap = L.map('mapid').setView([42.48112, 25.48645], 10);
+    var map = L.map('mapid').setView([42.48112, 25.48645], 10);
     L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
         maxZoom: 18
-    }).addTo(mymap);
+    }).addTo(map);
+
+    L.control.scale().addTo(map);
 
     var greenIcon = new L.Icon({
         iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
@@ -103,7 +105,7 @@ $(document).ready(function () {
             }
         },
         after: function (data) {
-            mymap.eachLayer(function (layer) {
+            map.eachLayer(function (layer) {
                 if (layer.feature && openPopupId && layer.feature.properties.id == openPopupId) {
                     layer.openPopup();
                     openPopupId = null;
@@ -117,7 +119,7 @@ $(document).ready(function () {
                 return L.marker(latlng, {icon: blueIcon})
             }
         }
-    }).addTo(mymap);
+    }).addTo(map);
 
     // load sidebar
     fnLoadSidebar();
@@ -130,9 +132,9 @@ $(document).ready(function () {
         var lon = $(this).data('lon');
         openPopupId = $(this).data('id');
 
-        mymap.panTo([lat, lon]);
+        map.panTo([lat, lon]);
         setTimeout(function () {
-            mymap.fireEvent('dragend');
+            map.fireEvent('dragend');
         }, 500);
 
     })
@@ -193,7 +195,7 @@ $(document).ready(function () {
         fnLoadSidebar();
 
         setTimeout(function () {
-            mymap.fireEvent('dragend');
+            map.fireEvent('dragend');
         }, 500);
     })
 })
