@@ -73,6 +73,7 @@
         integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ"
         crossorigin="anonymous"></script>
 <script src="/js/leaflet.uGeoJSON.js"></script>
+<script src="/js/leaflet-hash.js"></script>
 <script src="/js/jquery.tristate.js"></script>
 <script src="/js/scripts.js?ts=<?= time() ?>"></script>
 </body>
