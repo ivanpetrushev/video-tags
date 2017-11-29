@@ -47,6 +47,11 @@ class PlacesService
                 $oRecord = new Place();
             }
 
+            $coordinates = trim($item['Point']['coordinates']);
+            $coordinates = explode(',', $coordinates);
+            $oRecord->lon = $coordinates[0];
+            $oRecord->lat = $coordinates[1];
+
             $urls = [];
             if (!empty($item['ExtendedData']['Data']['value'])) {
                 $urls = explode(' ', $item['ExtendedData']['Data']['value']);
@@ -54,6 +59,11 @@ class PlacesService
 
             $oRecord->title = $item['name'];
             $oRecord->is_visited = (bool)(strstr($item['styleUrl'], $this->iconVisited));
+
+            if (! strstr($item['styleUrl'], $this->iconVisited) && ! strstr($item['styleUrl'], $this->iconNotVisited)) {
+                print "\nUncategorized object {$item['name']} at {$oRecord->lat}, {$oRecord->lon}\n";
+                continue;
+            }
 
             $description = preg_replace('/\<br(\s*)?\/?\>/i', "\n", $item['description']);
             $description = strip_tags($description);
@@ -77,11 +87,6 @@ class PlacesService
 
 
             $oRecord->description = trim($description);
-
-            $coordinates = trim($item['Point']['coordinates']);
-            $coordinates = explode(',', $coordinates);
-            $oRecord->lon = $coordinates[0];
-            $oRecord->lat = $coordinates[1];
 
             $oRecord->save();
 
