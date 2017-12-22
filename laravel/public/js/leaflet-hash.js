@@ -30,15 +30,26 @@
             categoryIdsYes = categoryIdsYes.split(',');
 
             window.filterCategories['only-visited'] = onlyVisited;
+            if (onlyVisited == 1) {
+                $('input[name="only-visited"]').val(1);
+                $('input[name="only-visited"]').attr('checked', 'checked').siblings('img').attr('src', '/images/chk1.gif');
+            } else if (onlyVisited == 2) {
+                $('input[name="only-visited"]').val(2);
+                $('input[name="only-visited"]').attr('indeterminate', 'indeterminate').siblings('img').attr('src', '/images/chk2.gif');
+            }
 
             for (var i in categoryIdsNo) {
                 var id = categoryIdsNo[i];
                 window.filterCategories['category-' + id] = 2;
+                $('input[name="category-' + id + '"]').val(2);
+                $('input[name="category-' + id + '"]').attr('indeterminate', 'indeterminate').siblings('img').attr('src', '/images/chk2.gif');
             }
 
             for (var i in categoryIdsYes) {
                 var id = categoryIdsYes[i];
                 window.filterCategories['category-' + id] = 1;
+                $('input[name="category-' + id + '"]').val(1);
+                $('input[name="category-' + id + '"]').attr('checked', 'checked').siblings('img').attr('src', '/images/chk1.gif');
             }
 
             fnLoadSidebar();
