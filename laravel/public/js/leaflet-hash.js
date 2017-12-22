@@ -18,6 +18,32 @@
 			hash = hash.substr(1);
 		}
 		var args = hash.split("/");
+
+		// add category filters to hash
+		if (args.length == 6) {
+            window.filterCategories = {};
+
+            var onlyVisited = args.pop();
+		    var categoryIdsNo = args.pop();
+		    var categoryIdsYes = args.pop();
+		    categoryIdsNo = categoryIdsNo.split(',');
+		    categoryIdsYes = categoryIdsYes.split(',');
+
+		    window.filterCategories['only-visited'] = onlyVisited;
+
+		    for (var i in categoryIdsNo) {
+		        var id = categoryIdsNo[i];
+		        window.filterCategories['category-'+id] = 2;
+            }
+
+            for (var i in categoryIdsYes) {
+                var id = categoryIdsYes[i];
+                window.filterCategories['category-'+id] = 1;
+            }
+
+            fnLoadSidebar();
+        }
+
 		if (args.length == 3) {
 			var zoom = parseInt(args[0], 10),
 			lat = parseFloat(args[1]),
@@ -40,9 +66,31 @@
 		    zoom = map.getZoom(),
 		    precision = Math.max(0, Math.ceil(Math.log(zoom) / Math.LN2));
 
+		var categoryIdsYes = [], categoryIdsNo = [], onlyVisited = '';
+
+		for (var i in window.filterCategories) {
+		    var id = null;
+            var matches = i.match(/category-(\d+)$/);
+		    if (matches) {
+		        id = matches[1];
+		        if (window.filterCategories[i]  == 1) {
+		            categoryIdsYes.push(id);
+                } else if (window.filterCategories[i]  == 2) {
+                    categoryIdsNo.push(id);
+                }
+            }
+        }
+
+		if (typeof window.filterCategories['only-visited'] != 'undefined') {
+            onlyVisited = window.filterCategories['only-visited'];
+        }
+
 		return "#" + [zoom,
 			center.lat.toFixed(precision),
-			center.lng.toFixed(precision)
+			center.lng.toFixed(precision),
+            categoryIdsYes.join(','),
+            categoryIdsNo.join(','),
+            onlyVisited
 		].join("/");
 	},
 

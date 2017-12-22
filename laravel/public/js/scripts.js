@@ -1,5 +1,6 @@
 var openPopupId = null;
 var filterCategories = {};
+var xhrGeojson = null;
 
 $(document).ready(function () {
 
@@ -56,42 +57,6 @@ $(document).ready(function () {
         popup.append(blogs);
 
         return popup.html();
-    }
-
-    function fnLoadSidebar() {
-        $.ajax({
-            url: '/geojson',
-            method: 'post',
-            data: {
-                filterCategories: JSON.stringify(filterCategories),
-                north: 90,
-                south: -90,
-                east: 180,
-                west: -180,
-            },
-            dataType: 'json',
-            success: function (data) {
-                $('.search-items').empty();
-
-                for (var i in data.features) {
-                    var feature = data.features[i];
-                    var tag = $('<a href="#" class="list-group-item small place">' + feature.properties.title + '</a>');
-                    tag.attr('data-id', feature.properties.id);
-                    tag.attr('data-lat', feature.geometry.coordinates[1]);
-                    tag.attr('data-lon', feature.geometry.coordinates[0]);
-                    if (feature.properties.is_visited) {
-                        tag.addClass('visited');
-                    } else {
-                        tag.addClass('not-visited');
-                    }
-
-                    if (feature.properties.description != '') {
-                        tag.append('<i class="fa fa-fw fa-comment"></i>');
-                    }
-                    $('.search-items').append(tag)
-                }
-            }
-        })
     }
 
     L.uGeoJSONLayer({
@@ -213,3 +178,47 @@ $(document).ready(function () {
         }, 500);
     })
 })
+
+function fnLoadSidebar() {
+    if (xhrGeojson) {
+        xhrGeojson.abort();
+    }
+
+    xhrGeojson = $.ajax({
+        url: '/geojson',
+        method: 'post',
+        data: {
+            filterCategories: JSON.stringify(filterCategories),
+            north: 90,
+            south: -90,
+            east: 180,
+            west: -180,
+        },
+        dataType: 'json',
+        success: function (data) {
+            xhrGeojson = null;
+            $('.search-items').empty();
+
+            for (var i in data.features) {
+                var feature = data.features[i];
+                var tag = $('<a href="#" class="list-group-item small place">' + feature.properties.title + '</a>');
+                tag.attr('data-id', feature.properties.id);
+                tag.attr('data-lat', feature.geometry.coordinates[1]);
+                tag.attr('data-lon', feature.geometry.coordinates[0]);
+                if (feature.properties.is_visited) {
+                    tag.addClass('visited');
+                } else {
+                    tag.addClass('not-visited');
+                }
+
+                if (feature.properties.description != '') {
+                    tag.append('<i class="fa fa-fw fa-comment"></i>');
+                }
+                $('.search-items').append(tag)
+            }
+        },
+        error: function() {
+            xhrGeojson = null;
+        }
+    })
+}
