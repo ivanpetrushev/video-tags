@@ -189,12 +189,24 @@ $(document).ready(function () {
 
     $('.do-filter').click(function () {
         window.filterCategories = {};
+        var cnt = 0;
+
         $('#category-form input').each(function (x, el) {
             var name = $(el).attr('name');
-            window.filterCategories[name] = $(el).val();
+            var val = $(el).val();
+            window.filterCategories[name] = val;
+            if (val != 0) {
+                cnt++;
+            }
         })
 
         fnLoadSidebar();
+
+        if (cnt == 0) {
+            $('#category-counter').html('');
+        } else {
+            $('#category-counter').html(cnt);
+        }
 
         setTimeout(function () {
             map.fireEvent('dragend');

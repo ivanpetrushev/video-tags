@@ -17,7 +17,10 @@
         <span href="#" class="list-group-item active">
             Интересни места
             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#search-form">
-                <span class="fa fa-reorder" aria-hidden="true"></span>
+                <span class="fa-stack fa">
+                    <i class="fa fa-superpowers fa-stack-2x"></i>
+                    <strong id="category-counter" class="fa-stack"></strong>
+                </span>
             </button>
         </span>
         <span href="#" class="list-group-item search">
