@@ -1,210 +1,210 @@
-(function(window) {
-	var HAS_HASHCHANGE = (function() {
-		var doc_mode = window.documentMode;
-		return ('onhashchange' in window) &&
-			(doc_mode === undefined || doc_mode > 7);
-	})();
+(function (window) {
+    var HAS_HASHCHANGE = (function () {
+        var doc_mode = window.documentMode;
+        return ('onhashchange' in window) &&
+            (doc_mode === undefined || doc_mode > 7);
+    })();
 
-	L.Hash = function(map) {
-		this.onHashChange = L.Util.bind(this.onHashChange, this);
+    L.Hash = function (map) {
+        this.onHashChange = L.Util.bind(this.onHashChange, this);
 
-		if (map) {
-			this.init(map);
-		}
-	};
+        if (map) {
+            this.init(map);
+        }
+    };
 
-	L.Hash.parseHash = function(hash) {
-		if(hash.indexOf('#') === 0) {
-			hash = hash.substr(1);
-		}
-		var args = hash.split("/");
+    L.Hash.parseHash = function (hash) {
+        if (hash.indexOf('#') === 0) {
+            hash = hash.substr(1);
+        }
+        var args = hash.split("/");
 
-		// add category filters to hash
-		if (args.length == 6) {
+        // add category filters to hash
+        if (args.length == 6) {
             window.filterCategories = {};
 
             var onlyVisited = args.pop();
-		    var categoryIdsNo = args.pop();
-		    var categoryIdsYes = args.pop();
-		    categoryIdsNo = categoryIdsNo.split(',');
-		    categoryIdsYes = categoryIdsYes.split(',');
+            var categoryIdsNo = args.pop();
+            var categoryIdsYes = args.pop();
+            categoryIdsNo = categoryIdsNo.split(',');
+            categoryIdsYes = categoryIdsYes.split(',');
 
-		    window.filterCategories['only-visited'] = onlyVisited;
+            window.filterCategories['only-visited'] = onlyVisited;
 
-		    for (var i in categoryIdsNo) {
-		        var id = categoryIdsNo[i];
-		        window.filterCategories['category-'+id] = 2;
+            for (var i in categoryIdsNo) {
+                var id = categoryIdsNo[i];
+                window.filterCategories['category-' + id] = 2;
             }
 
             for (var i in categoryIdsYes) {
                 var id = categoryIdsYes[i];
-                window.filterCategories['category-'+id] = 1;
+                window.filterCategories['category-' + id] = 1;
             }
 
             fnLoadSidebar();
         }
 
-		if (args.length == 3) {
-			var zoom = parseInt(args[0], 10),
-			lat = parseFloat(args[1]),
-			lon = parseFloat(args[2]);
-			if (isNaN(zoom) || isNaN(lat) || isNaN(lon)) {
-				return false;
-			} else {
-				return {
-					center: new L.LatLng(lat, lon),
-					zoom: zoom
-				};
-			}
-		} else {
-			return false;
-		}
-	};
+        if (args.length == 3) {
+            var zoom = parseInt(args[0], 10),
+                lat = parseFloat(args[1]),
+                lon = parseFloat(args[2]);
+            if (isNaN(zoom) || isNaN(lat) || isNaN(lon)) {
+                return false;
+            } else {
+                return {
+                    center: new L.LatLng(lat, lon),
+                    zoom: zoom
+                };
+            }
+        } else {
+            return false;
+        }
+    };
 
-	L.Hash.formatHash = function(map) {
-		var center = map.getCenter(),
-		    zoom = map.getZoom(),
-		    precision = Math.max(0, Math.ceil(Math.log(zoom) / Math.LN2));
+    L.Hash.formatHash = function (map) {
+        var center = map.getCenter(),
+            zoom = map.getZoom(),
+            precision = Math.max(0, Math.ceil(Math.log(zoom) / Math.LN2));
 
-		var categoryIdsYes = [], categoryIdsNo = [], onlyVisited = '';
+        var categoryIdsYes = [], categoryIdsNo = [], onlyVisited = '';
 
-		for (var i in window.filterCategories) {
-		    var id = null;
+        for (var i in window.filterCategories) {
+            var id = null;
             var matches = i.match(/category-(\d+)$/);
-		    if (matches) {
-		        id = matches[1];
-		        if (window.filterCategories[i]  == 1) {
-		            categoryIdsYes.push(id);
-                } else if (window.filterCategories[i]  == 2) {
+            if (matches) {
+                id = matches[1];
+                if (window.filterCategories[i] == 1) {
+                    categoryIdsYes.push(id);
+                } else if (window.filterCategories[i] == 2) {
                     categoryIdsNo.push(id);
                 }
             }
         }
 
-		if (typeof window.filterCategories['only-visited'] != 'undefined') {
+        if (typeof window.filterCategories['only-visited'] != 'undefined') {
             onlyVisited = window.filterCategories['only-visited'];
         }
 
-		return "#" + [zoom,
-			center.lat.toFixed(precision),
-			center.lng.toFixed(precision),
+        return "#" + [zoom,
+            center.lat.toFixed(precision),
+            center.lng.toFixed(precision),
             categoryIdsYes.join(','),
             categoryIdsNo.join(','),
             onlyVisited
-		].join("/");
-	},
+        ].join("/");
+    },
 
-	L.Hash.prototype = {
-		map: null,
-		lastHash: null,
+        L.Hash.prototype = {
+            map: null,
+            lastHash: null,
 
-		parseHash: L.Hash.parseHash,
-		formatHash: L.Hash.formatHash,
+            parseHash: L.Hash.parseHash,
+            formatHash: L.Hash.formatHash,
 
-		init: function(map) {
-			this.map = map;
+            init: function (map) {
+                this.map = map;
 
-			// reset the hash
-			this.lastHash = null;
-			this.onHashChange();
+                // reset the hash
+                this.lastHash = null;
+                this.onHashChange();
 
-			if (!this.isListening) {
-				this.startListening();
-			}
-		},
+                if (!this.isListening) {
+                    this.startListening();
+                }
+            },
 
-		removeFrom: function(map) {
-			if (this.changeTimeout) {
-				clearTimeout(this.changeTimeout);
-			}
+            removeFrom: function (map) {
+                if (this.changeTimeout) {
+                    clearTimeout(this.changeTimeout);
+                }
 
-			if (this.isListening) {
-				this.stopListening();
-			}
+                if (this.isListening) {
+                    this.stopListening();
+                }
 
-			this.map = null;
-		},
+                this.map = null;
+            },
 
-		onMapMove: function() {
-			// bail if we're moving the map (updating from a hash),
-			// or if the map is not yet loaded
+            onMapMove: function () {
+                // bail if we're moving the map (updating from a hash),
+                // or if the map is not yet loaded
 
-			if (this.movingMap || !this.map._loaded) {
-				return false;
-			}
+                if (this.movingMap || !this.map._loaded) {
+                    return false;
+                }
 
-			var hash = this.formatHash(this.map);
-			if (this.lastHash != hash) {
-				location.replace(hash);
-				this.lastHash = hash;
-			}
-		},
+                var hash = this.formatHash(this.map);
+                if (this.lastHash != hash) {
+                    location.replace(hash);
+                    this.lastHash = hash;
+                }
+            },
 
-		movingMap: false,
-		update: function() {
-			var hash = location.hash;
-			if (hash === this.lastHash) {
-				return;
-			}
-			var parsed = this.parseHash(hash);
-			if (parsed) {
-				this.movingMap = true;
+            movingMap: false,
+            update: function () {
+                var hash = location.hash;
+                if (hash === this.lastHash) {
+                    return;
+                }
+                var parsed = this.parseHash(hash);
+                if (parsed) {
+                    this.movingMap = true;
 
-				this.map.setView(parsed.center, parsed.zoom);
+                    this.map.setView(parsed.center, parsed.zoom);
 
-				this.movingMap = false;
-			} else {
-				this.onMapMove(this.map);
-			}
-		},
+                    this.movingMap = false;
+                } else {
+                    this.onMapMove(this.map);
+                }
+            },
 
-		// defer hash change updates every 100ms
-		changeDefer: 100,
-		changeTimeout: null,
-		onHashChange: function() {
-			// throttle calls to update() so that they only happen every
-			// `changeDefer` ms
-			if (!this.changeTimeout) {
-				var that = this;
-				this.changeTimeout = setTimeout(function() {
-					that.update();
-					that.changeTimeout = null;
-				}, this.changeDefer);
-			}
-		},
+            // defer hash change updates every 100ms
+            changeDefer: 100,
+            changeTimeout: null,
+            onHashChange: function () {
+                // throttle calls to update() so that they only happen every
+                // `changeDefer` ms
+                if (!this.changeTimeout) {
+                    var that = this;
+                    this.changeTimeout = setTimeout(function () {
+                        that.update();
+                        that.changeTimeout = null;
+                    }, this.changeDefer);
+                }
+            },
 
-		isListening: false,
-		hashChangeInterval: null,
-		startListening: function() {
-			this.map.on("moveend", this.onMapMove, this);
+            isListening: false,
+            hashChangeInterval: null,
+            startListening: function () {
+                this.map.on("moveend", this.onMapMove, this);
 
-			if (HAS_HASHCHANGE) {
-				L.DomEvent.addListener(window, "hashchange", this.onHashChange);
-			} else {
-				clearInterval(this.hashChangeInterval);
-				this.hashChangeInterval = setInterval(this.onHashChange, 50);
-			}
-			this.isListening = true;
-		},
+                if (HAS_HASHCHANGE) {
+                    L.DomEvent.addListener(window, "hashchange", this.onHashChange);
+                } else {
+                    clearInterval(this.hashChangeInterval);
+                    this.hashChangeInterval = setInterval(this.onHashChange, 50);
+                }
+                this.isListening = true;
+            },
 
-		stopListening: function() {
-			this.map.off("moveend", this.onMapMove, this);
+            stopListening: function () {
+                this.map.off("moveend", this.onMapMove, this);
 
-			if (HAS_HASHCHANGE) {
-				L.DomEvent.removeListener(window, "hashchange", this.onHashChange);
-			} else {
-				clearInterval(this.hashChangeInterval);
-			}
-			this.isListening = false;
-		}
-	};
-	L.hash = function(map) {
-		return new L.Hash(map);
-	};
-	L.Map.prototype.addHash = function() {
-		this._hash = L.hash(this);
-	};
-	L.Map.prototype.removeHash = function() {
-		this._hash.removeFrom();
-	};
+                if (HAS_HASHCHANGE) {
+                    L.DomEvent.removeListener(window, "hashchange", this.onHashChange);
+                } else {
+                    clearInterval(this.hashChangeInterval);
+                }
+                this.isListening = false;
+            }
+        };
+    L.hash = function (map) {
+        return new L.Hash(map);
+    };
+    L.Map.prototype.addHash = function () {
+        this._hash = L.hash(this);
+    };
+    L.Map.prototype.removeHash = function () {
+        this._hash.removeFrom();
+    };
 })(window);
