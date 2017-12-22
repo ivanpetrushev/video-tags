@@ -26,6 +26,7 @@
             var onlyVisited = args.pop();
             var categoryIdsNo = args.pop();
             var categoryIdsYes = args.pop();
+            var cnt = 0;
             categoryIdsNo = categoryIdsNo.split(',');
             categoryIdsYes = categoryIdsYes.split(',');
 
@@ -39,6 +40,7 @@
             }
 
             for (var i in categoryIdsNo) {
+                cnt++;
                 var id = categoryIdsNo[i];
                 window.filterCategories['category-' + id] = 2;
                 $('input[name="category-' + id + '"]').val(2);
@@ -46,12 +48,19 @@
             }
 
             for (var i in categoryIdsYes) {
+                cnt++;
                 var id = categoryIdsYes[i];
                 window.filterCategories['category-' + id] = 1;
                 $('input[name="category-' + id + '"]').val(1);
                 $('input[name="category-' + id + '"]').attr('checked', 'checked').siblings('img').attr('src', '/images/chk1.gif');
             }
 
+            if (cnt == 0) {
+                $('#category-counter').html('');
+            } else {
+                $('#category-counter').html(cnt);
+            }
+            
             fnLoadSidebar();
         }
 
