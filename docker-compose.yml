@@ -50,7 +50,7 @@ services:
             PMA_HOST: db
         depends_on:
             - db
-    cron:
-        build: ./cron
-        volumes_from:
-            - php
+#    cron:
+#        build: ./cron
+#        volumes_from:
+#            - php

@@ -5,10 +5,24 @@ var xhrGeojson = null;
 $(document).ready(function () {
 
     var map = L.map('mapid').setView([42.48112, 25.48645], 10);
-    L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    var osmLayer = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
         maxZoom: 18
     }).addTo(map);
+
+    var bgmLayer = L.tileLayer('https://bgmtile.kade.si/{z}/{x}/{y}.png', {
+        attribution: 'Map data &copy; <a href="http://kade.si">BGMountains</a>, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-NC-SA 2.5</a>',
+        maxZoom: 18
+    });
+
+    var aeroLayer = L.tileLayer('http://212.122.182.109/tiles/aero_3857/{z}/{x}/{y}.png');
+
+    var baseLayers = {
+        'OpenStreetMap': osmLayer,
+        'BGMountains': bgmLayer,
+        'Aero': aeroLayer
+    }
+    L.control.layers(baseLayers).addTo(map);
 
     L.control.scale().addTo(map);
 
