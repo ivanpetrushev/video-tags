@@ -24,7 +24,7 @@ class PlacesController extends Controller
         parent::__construct();
     }
 
-    public function geojson(Request $request)
+    protected function generateWheres($request)
     {
         $south = $request->input('south'); // lat
         $north = $request->input('north'); // lat
@@ -59,6 +59,20 @@ class PlacesController extends Controller
                 }
             }
         }
+
+        return [
+            'where' => $where,
+            'whereHas' => $whereHas,
+            'whereDoesntHave' => $whereDoesntHave
+        ];
+    }
+
+    public function geojson(Request $request)
+    {
+        $wheres = $this->generateWheres($request);
+        $where = $wheres['where'];
+        $whereHas = $wheres['whereHas'];
+        $whereDoesntHave = $wheres['whereDoesntHave'];
 
         $query = Place::where($where);
         $query->with('categories', 'categories.category');
@@ -147,7 +161,68 @@ class PlacesController extends Controller
         echo json_encode($geoJSON);
     }
 
-    public function categories()
+    public function gpx(Request $request)
+    {
+        $wheres = $this->generateWheres($request);
+        $where = $wheres['where'];
+        $whereHas = $wheres['whereHas'];
+        $whereDoesntHave = $wheres['whereDoesntHave'];
+
+        $query = Place::where($where);
+        $query->with('categories', 'categories.category');
+        $data = $query->get();
+
+        $xml = new \SimpleXMLElement("<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>".
+            '<gpx version="1.1" xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd"></gpx>');
+
+        foreach ($data as $item) {
+            $categories = $item->categories;
+
+            if (! empty($whereHas)) {
+                $allowed = true;
+                foreach ($whereHas as $catId) {
+                    $categoryFound = false;
+                    foreach ($categories as $category) {
+                        if ($catId == $category->category_id) {
+                            $categoryFound = true;
+                        }
+                    }
+                    if (! $categoryFound) {
+                        $allowed = false;
+                        break;
+                    }
+                }
+                if (! $allowed) {
+                    continue;
+                }
+            }
+
+            if (! empty($whereDoesntHave)) {
+                $allowed = true;
+                foreach ($whereDoesntHave as $catId) {
+                    foreach ($categories as $category) {
+                        if ($catId == $category->category_id) {
+                            $allowed = false;
+                        }
+                    }
+                }
+                if (! $allowed) {
+                    continue;
+                }
+            }
+
+            $wpt = $xml->addChild('wpt');
+            $wpt->addAttribute('lat', $item->lat);
+            $wpt->addAttribute('lon', $item->lon);
+            $wpt->addChild('name', $item->title);
+        }
+
+        header('Content-Disposition: attachment; filename="waypoints.gpx"');
+        header('Content-type: text/xml');
+        print($xml->asXML());
+    }
+
+        public function categories()
     {
         $data = Category::orderBy('title', 'ASC')->get();
 

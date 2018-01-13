@@ -26,6 +26,13 @@ $(document).ready(function () {
 
     L.control.scale().addTo(map);
 
+    L.easyButton('fa-cloud-download', function (btn, map) {
+        var b = map.getBounds();
+        var url = '/gpx?north=' + b.getNorth() + '&south=' + b.getSouth() + '&west=' + b.getWest() + '&east=' + b.getEast();
+        url += '&filterCategories=' + JSON.stringify(window.filterCategories);
+        window.open(url)
+    }).addTo(map);
+
     var hash = new L.Hash(map);
 
     var greenIcon = new L.Icon({

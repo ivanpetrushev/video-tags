@@ -13,6 +13,7 @@
 
 Route::post('/geojson', 'PlacesController@geojson');
 Route::get('/categories', 'PlacesController@categories');
+Route::get('/gpx', 'PlacesController@gpx');
 
 Route::get('/', function () {
     return view('welcome');
