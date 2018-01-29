@@ -19,7 +19,7 @@
             Интересни места
             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#search-form">
                 <span class="fa-stack fa">
-                    <i class="fa fa-superpowers fa-stack-2x"></i>
+                    <i class="fa fa-folder-o fa-stack-2x"></i>
                     <strong id="category-counter" class="fa-stack"></strong>
                 </span>
             </button>

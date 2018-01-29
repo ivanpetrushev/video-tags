@@ -82,7 +82,7 @@ class PlacesService
                 foreach ($categoryNames as $categoryName) {
                     $categoryIds[] = $this->resolveCategory($categoryName);
                 }
-                $description = str_replace($matches[0], $description, '');
+                $description = str_replace($matches[0], '', $description);
             }
 
 
