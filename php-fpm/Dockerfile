@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         git \
         zip \
         unzip \
-        php-pclzip \
+#        php-pclzip \
 #        libfreetype6-dev \
 #        libjpeg62-turbo-dev \
 #        libpng12-dev \
