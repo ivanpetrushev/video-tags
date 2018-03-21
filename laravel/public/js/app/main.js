@@ -162,7 +162,7 @@ Ext.define('App.main', {
 
     getAddDirectoryWindow: function() {
         Ext.Msg.prompt('Add directory', 'Enter path relative to public/data', function(btn, val) {
-            
+
         })
     }
 })

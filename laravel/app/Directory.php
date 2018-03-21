@@ -5,11 +5,8 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 
 
-class Category extends Model
+class Directory extends Model
 {
-    protected $table = 'categories';
-
+    protected $table = 'directories';
     public $timestamps = false;
-
-
 }

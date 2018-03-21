@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Place;
+use App\File;
 use App\PlaceLink;
-use App\Category;
+use App\Directory;
 use DB;
 use App\Services\PlacesService;
 use Illuminate\Support\Facades\Log;
@@ -74,7 +74,7 @@ class PlacesController extends Controller
         $whereHas = $wheres['whereHas'];
         $whereDoesntHave = $wheres['whereDoesntHave'];
 
-        $query = Place::where($where);
+        $query = File::where($where);
         $query->with('categories', 'categories.category');
         $data = $query->get();
 
@@ -168,7 +168,7 @@ class PlacesController extends Controller
         $whereHas = $wheres['whereHas'];
         $whereDoesntHave = $wheres['whereDoesntHave'];
 
-        $query = Place::where($where);
+        $query = File::where($where);
         $query->with('categories', 'categories.category');
         $data = $query->get();
 
@@ -224,7 +224,7 @@ class PlacesController extends Controller
 
         public function categories()
     {
-        $data = Category::orderBy('title', 'ASC')->get();
+        $data = Directory::orderBy('title', 'ASC')->get();
 
         echo json_encode([
             'success' => true,

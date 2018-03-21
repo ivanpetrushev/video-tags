@@ -2,10 +2,10 @@
 
 namespace App\Services;
 
-use App\Place;
+use App\File;
 use App\PlaceLink;
-use App\Category;
-use App\PlaceCategory;
+use App\Directory;
+use App\FileTag;
 use DB;
 use XmlParser;
 
@@ -42,9 +42,9 @@ class PlacesService
                 print "$idx/$cnt done\r";
             }
 
-            $oRecord = Place::where('title', $item['name'])->first();
+            $oRecord = File::where('title', $item['name'])->first();
             if (!$oRecord) {
-                $oRecord = new Place();
+                $oRecord = new File();
             }
 
             $coordinates = trim($item['Point']['coordinates']);
@@ -114,7 +114,7 @@ class PlacesService
             }
 
             foreach ($categoryIds as $categoryId) {
-                $oRecordPlaceCategory = new PlaceCategory();
+                $oRecordPlaceCategory = new FileTag();
                 $oRecordPlaceCategory->place_id = $oRecord->id;
                 $oRecordPlaceCategory->category_id = $categoryId;
                 $oRecordPlaceCategory->save();
@@ -159,7 +159,7 @@ class PlacesService
     {
         $name = trim($name);
         if (!isset($this->categoryMap[$name])) {
-            $category = new Category();
+            $category = new Directory();
             $category->title = $name;
             $category->save();
 
@@ -174,7 +174,7 @@ class PlacesService
         $result = DB::table('places_categories')->selectRaw('category_id, COUNT(category_id) as cnt')->groupBy('category_id')->get();
 
         foreach ($result as $row) {
-            Category::where('id', $row->category_id)->update(['num_occurencies' => $row->cnt]);
+            Directory::where('id', $row->category_id)->update(['num_occurencies' => $row->cnt]);
         }
     }
 }

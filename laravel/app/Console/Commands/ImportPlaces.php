@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Place;
+use App\File;
 use Illuminate\Console\Command;
 use App\Services\PlacesService;
 
