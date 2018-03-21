@@ -52,11 +52,41 @@ Ext.define('App.main', {
             items: [
                 {
                     region: 'center',
-                    html: 'center'
-                }, {
+                    border: true,
+                    id: 'video-container',
+                    // xtype: 'video',
+                    // url: '/data/DJI_0010.MOV',
+                    // width: 500,
+                    // controls: true
+                    html: '<video controls width="600" autoplay id="my-video" class="video-js" data-setup=\'{}\' style="margin: 0 auto; width: 600px;">' +
+                            '<source src="/data/DJI_0010.MOV" type="video/mp4">' +
+                        '</video>'
+                },
+                {
                     region: 'south',
                     height: 300,
-                    html: 'south'
+                    id: 'timeline-container',
+                    listeners: {
+                        render: function(){
+                            var container = document.getElementById('timeline-container-innerCt');
+
+                            // Create a DataSet (allows two way data-binding)
+                            var items = new vis.DataSet([
+                                {id: 1, content: 'Пловдив', start: '2013-04-20'},
+                                {id: 2, content: 'река', start: '2013-04-14'},
+                                {id: 3, content: 'Марица', start: '2013-04-18'},
+                                {id: 4, content: 'залез', start: '2013-04-16', end: '2013-04-19'},
+                                {id: 5, content: 'item 5', start: '2013-04-25'},
+                                {id: 6, content: 'item 6', start: '2013-04-27'}
+                            ]);
+
+                            // Configuration for the Timeline
+                            var options = {};
+
+                            // Create a Timeline
+                            var timeline = new vis.Timeline(container, items, options);
+                        }
+                    }
                 }
             ]
         }, {
@@ -64,6 +94,7 @@ Ext.define('App.main', {
             xtype: 'grid',
             region: 'east',
             border: true,
+            split: true,
             width: 300,
             store: Ext.create('Ext.data.Store', {
                 fields:[ 'name', 'email', 'phone'],
