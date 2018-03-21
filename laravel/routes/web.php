@@ -11,9 +11,10 @@
 |
 */
 
-Route::post('/geojson', 'PlacesController@geojson');
-Route::get('/categories', 'PlacesController@categories');
-Route::get('/gpx', 'PlacesController@gpx');
+Route::resource('directory', 'DirectoryController', ['only' => ['index', 'store', 'update', 'destroy']]);
+//Route::get('/directory', 'DirectoryController@listing');
+//Route::post('/directory', 'DirectoryController@add');
+//Route::delete('/directory', 'DirectoryController@delete');
 
 Route::get('/', function () {
     return view('welcome');
