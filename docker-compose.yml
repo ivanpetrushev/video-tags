@@ -20,6 +20,7 @@ services:
         tty: true
         volumes:
             - ./laravel:/var/www/laravel
+            - /home/ivanatora/snimki/:/var/www/laravel/public/data
         links:
             - db
     apache:

@@ -174,6 +174,8 @@ Ext.define('App.main', {
                     response = Ext.decode(response.responseText);
                     if (response.success) {
                         console.log("yay!")
+                    } else {
+                        Ext.Msg.alert('Error', response.error);
                     }
                 }
             })

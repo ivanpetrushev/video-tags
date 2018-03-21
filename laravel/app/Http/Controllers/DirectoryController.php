@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Directory;
 use DB;
 use Illuminate\Support\Facades\Log;
-use PhpParser\Node\Scalar\MagicConst\Dir;
+use Illuminate\Support\Facades\Storage;
 
 class DirectoryController extends Controller
 {
@@ -35,6 +35,12 @@ class DirectoryController extends Controller
     {
         $oRecord = new Directory();
         $oRecord->path = $request->input('directory.path');
+
+        // test if this directory is reachable
+        $sDefaultPath = '/var/www/laravel/public/data/';
+        if (!is_dir($sDefaultPath . $oRecord->path)) {
+            return response()->json(['success' => false, 'error' => $oRecord->path . ' is not a directory. Check mount points in docker-compose.yml']);
+        }
 
         try {
             $oRecord->save();
