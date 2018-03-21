@@ -8,9 +8,9 @@ Ext.require('App.main')
 
 
 Ext.application({
-    name : 'Fiddle',
+    name : 'Video Tags',
 
     launch : function() {
-        Ext.create('App.main').show();
+        Ext.create('App.main').createWindow();
     }
 });
