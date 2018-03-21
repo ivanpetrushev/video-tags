@@ -1,65 +1,11 @@
-html, body {
-    height: 100%;
+.x-fa.color-green {
+    color: green;
 }
 
-.wrapper {
-    display: flex;
-    align-items: stretch;
-    height: 100%;
+.x-fa.color-blue {
+    color: blue;
 }
 
-#mapid {
-    height: 100%;
-    width: 90%;
-}
-
-#sidebar {
-    width: 260px;
-    height: 100%;
-    overflow: scroll;
-}
-
-#category-counter {
-    /*color: red;*/
-}
-
-.list-group-item.search {
-    padding: 0;
-    width: 100%;
-}
-.list-group-item.hidden {
-    display: none;
-}
-.list-group-item.place {
-    background-repeat: no-repeat;
-    background-size: 20px;
-    background-position-y: center;
-    padding-left: 26px;
-}
-.list-group-item.place.visited {
-    background-image: url(https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png);
-}
-.list-group-item.place.not-visited {
-    background-image: url(https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png);
-}
-
-.title {
-    font-weight: bold;
-    font-size: 1.2em;
-    text-align: center;
-}
-
-.leaflet-popup-content {
-    width: 340px;
-}
-.leaflet-popup-content .images {
-    text-align: center;
-}
-.leaflet-popup-content img {
-    max-width: 300px;
-    max-height: 240px;
-}
-
-.tristate {
-    display: none;
+.x-fa.color-red {
+    color: red;
 }

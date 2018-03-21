@@ -3,6 +3,7 @@
 <head>
     <title>Video tags</title>
     <link rel="stylesheet" type="text/css" href="/extjs/classic/theme-triton/resources/theme-triton-all.css">
+    <link rel="stylesheet" type="text/css" href="/css/styles.css">
 
 </head>
 <body>
