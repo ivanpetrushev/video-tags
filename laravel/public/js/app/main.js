@@ -1,6 +1,8 @@
 Ext.define('App.main', {
     extend: 'Ext.window.Window',
 
+    timeline: null,
+
     createWindow: function () {
         var me = this;
 
@@ -27,6 +29,7 @@ Ext.define('App.main', {
                 fields: [
                     // { name: 'id', type: 'int'},
                     { name: 'directory_id', type: 'int'},
+                    { name: 'fullpath', type: 'string'},
                     { name: 'path', type: 'string'},
                     { name: 'filename', type: 'string'},
                     { name: 'duration', type: 'int'}
@@ -51,6 +54,24 @@ Ext.define('App.main', {
         return me.treeStore;
     },
 
+    getTagStore: function() {
+        var me = this;
+        if (! me.tagStore) {
+            me.tagStore = Ext.create('Ext.data.Store', {
+                fields: ['tag_name', 'start_time', 'duration', 'start_time_is', 'duration_is'],
+                proxy: {
+                    type: 'ajax',
+                    url: '/file/tags',
+                    reader: {
+                        type: 'json',
+                        rootProperty: 'data'
+                    }
+                }
+            })
+        }
+        return me.tagStore;
+    },
+
     getWestPanel: function () {
         var me = this;
         if (!me.westPanel) {
@@ -62,6 +83,18 @@ Ext.define('App.main', {
                 split: true,
                 store: me.getTreeStore(),
                 rootVisible: false,
+                columns: [
+                    {
+                        xtype: 'treecolumn',
+                        text: 'File',
+                        dataIndex: 'text',
+                        flex: 1
+                    }, {
+                        text: 'Duration',
+                        dataIndex: 'duration',
+                        width: 80
+                    }
+                ],
                 tbar: [
                     {
                         xtype: 'button',
@@ -74,7 +107,34 @@ Ext.define('App.main', {
                         xtype: 'button',
                         iconCls: 'x-fa fa-times color-red'
                     }
-                ]
+                ],
+                listeners: {
+                    selectionchange: function(cmp, selected) {
+                        if (Ext.isEmpty(selected)) {
+                            return;
+                        }
+                        rec = selected[0].data;
+                        var url = '/data/' + rec.fullpath;
+                        var player = videojs('my-video')
+                        player.src({
+                            type: 'video/mp4',
+                            src: url
+                        })
+
+                        var dtStart = new Date('2001-01-01 00:00:00')
+                        var dtEnd = new Date('2001-01-01 00:00:00')
+                        var seconds = dtStart.getSeconds();
+                        dtEnd.setSeconds(seconds + rec.duration);
+
+                        me.timeline.setWindow(dtStart, dtEnd);
+
+                        me.getTagStore().load({
+                            params: {
+                                file_id: rec.id
+                            }
+                        })
+                    }
+                }
             })
         }
         return me.westPanel;
@@ -93,7 +153,7 @@ Ext.define('App.main', {
                         border: true,
                         id: 'video-container',
                         html: '<video controls width="600" id="my-video" class="video-js" data-setup=\'{}\' style="margin: 0 auto; width: 600px;">' +
-                                '<source src="/data/DJI_0010.MOV" type="video/mp4">' +
+                                '<source src="/data/dir2/DJI_0010.MOV" type="video/mp4">' +
                             '</video>'
                     },
                     {
@@ -115,13 +175,14 @@ Ext.define('App.main', {
                                 // Configuration for the Timeline
                                 var options = {
                                     showCurrentTime: true,
+                                    showMajorLabels: false,
                                     start: '2001-01-01 00:00:00',
-                                    end: '2001-01-01 00:00:55:'
+                                    end: '2001-01-01 00:00:55'
                                 };
 
                                 // Create a Timeline
-                                var timeline = new vis.Timeline(container, items, options);
-                                timeline.addCustomTime('2001-01-01 00:00:00', 't1')
+                                me.timeline = new vis.Timeline(container, items, options);
+                                me.timeline.addCustomTime('2001-01-01 00:00:00', 't1')
 
                                 var player = videojs('my-video')
                                 player.on('timeupdate', function (e) {
@@ -130,10 +191,10 @@ Ext.define('App.main', {
                                     var dt = new Date('2001-01-01 00:00:00');
                                     var seconds = dt.getSeconds();
                                     dt.setSeconds(seconds + pos);
-                                    timeline.setCustomTime(dt, 't1');
+                                    me.timeline.setCustomTime(dt, 't1');
                                 })
 
-                                timeline.on('timechanged', function (e) {
+                                me.timeline.on('timechanged', function (e) {
                                     if (e.id == 't1') {
                                         var dt = new Date(e.time)
                                         var dtStart = new Date('2001-01-01 00:00:00');
@@ -160,19 +221,11 @@ Ext.define('App.main', {
                 border: true,
                 split: true,
                 width: 300,
-                store: Ext.create('Ext.data.Store', {
-                    fields: ['name', 'email', 'phone'],
-                    data: [
-                        {tag: 'Пловдив', start: '00:12', duration: '13'},
-                        {tag: 'река', start: '00:22', duration: '33'},
-                        {tag: 'Марица', start: '00:32', duration: '11'},
-                        {tag: 'залез', start: '00:12', duration: '5'}
-                    ]
-                }),
+                store: me.getTagStore(),
                 columns: [
-                    {text: 'Tag', dataIndex: 'tag', flex: 1},
-                    {text: 'Start', dataIndex: 'start', flex: 1},
-                    {text: 'Duration', dataIndex: 'duration', flex: 1}
+                    {text: 'Tag', dataIndex: 'tag_name', flex: 1},
+                    {text: 'Start', dataIndex: 'start_time_is', flex: 1},
+                    {text: 'Duration', dataIndex: 'duration_is', flex: 1}
                 ],
                 tbar: [
                     {

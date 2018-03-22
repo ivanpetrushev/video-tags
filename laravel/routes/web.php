@@ -13,6 +13,7 @@
 
 Route::resource('directory', 'DirectoryController', ['only' => ['index', 'store', 'update', 'destroy']]);
 Route::get('/directory/tree', 'DirectoryController@tree');
+Route::get('/file/tags', 'FileController@tags');
 
 Route::get('/', function () {
     return view('welcome');

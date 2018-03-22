@@ -13,11 +13,11 @@ class FileTag extends Model
 
     public function file()
     {
-        return $this->hasOne('App\File');
+        return $this->belongsTo('App\File');
     }
 
     public function tag()
     {
-        return $this->hasOne('App\Tag');
+        return $this->belongsTo('App\Tag');
     }
 }

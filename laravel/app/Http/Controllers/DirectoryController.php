@@ -112,7 +112,7 @@ class DirectoryController extends Controller
             } else {
                 $arr = [];
                 foreach ($files as $file) {
-                    $arr[$file->path] = $file->path;
+                    $arr[$file->path] = $file->toArray();
                 }
                 $tree = $this->explodeTree($arr, '/');
                 $children = $this->treeToChildren($tree);
@@ -128,10 +128,20 @@ class DirectoryController extends Controller
         $data = [];
 
         foreach ($tree as $dir => $contents) {
-            if (is_array($contents)) {
+            if (!isset($contents['id'])) {
                 $data[] = ['text' => $dir, 'leaf' => false, 'expanded' => true, 'children' => $this->treeToChildren($contents)];
             } else {
-                $data[] = ['text' => $dir, 'leaf' => true];
+                $oFile = File::find($contents['id']);
+                $oDirectory = $oFile->directory;
+
+                $data[] = [
+                    'text' => $dir,
+                    'leaf' => true,
+                    'id' => $contents['id'],
+                    'duration' => $contents['duration'],
+                    'path' => $contents['path'],
+                    'fullpath' => $oDirectory['path'] . $oFile['path']
+                ];
             }
         }
         return $data;
