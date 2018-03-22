@@ -20,9 +20,13 @@ class CreateBaseTables extends Migration
 
         Schema::create('files', function (Blueprint $table) {
             $table->increments('id');
+            $table->unsignedInteger('directory_id');
             $table->text('path');
             $table->string('filename', 255)->default('');
             $table->integer('duration')->default(0);
+
+            $table->index('directory_id');
+            $table->foreign('directory_id')->references('id')->on('directories')->onDelete('cascade');
         });
 
         Schema::create('tags', function (Blueprint $table) {

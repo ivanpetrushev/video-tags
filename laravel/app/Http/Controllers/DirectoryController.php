@@ -2,25 +2,26 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\ScanService;
 use Illuminate\Http\Request;
 use App\Directory;
 use DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
+use PhpParser\Node\Scalar\MagicConst\Dir;
 
 class DirectoryController extends Controller
 {
     /**
-     * @var PlacesService
+     * @var ScanService
      */
-//    protected $places;
+    protected $scanService;
 
-//    public function construct(PlacesService $places)
-//    {
-//        $this->places = $places;
-//
-//        parent::__construct();
-//    }
+    public function construct(ScanService $scanService)
+    {
+        $this->scanService = $scanService;
+
+        parent::__construct();
+    }
 
     public function index($request)
     {
@@ -37,13 +38,20 @@ class DirectoryController extends Controller
         $oRecord->path = $request->input('directory.path');
 
         // test if this directory is reachable
-        $sDefaultPath = '/var/www/laravel/public/data/';
-        if (!is_dir($sDefaultPath . $oRecord->path)) {
+        $sDefaultPath = '/var/www/html/docroot/public/data/';
+        $sTestPath = $sDefaultPath . $oRecord->path;
+        if (!is_dir($sTestPath)) {
             return response()->json(['success' => false, 'error' => $oRecord->path . ' is not a directory. Check mount points in docker-compose.yml']);
+        }
+
+        $bExists = Directory::where('path', $oRecord->path)->count();
+        if ($bExists) {
+            return response()->json(['success' => false, 'error' => 'Directory is already added']);
         }
 
         try {
             $oRecord->save();
+            $this->scanService->scanDir($oRecord->path);
         } catch (\Illuminate\Database\QueryException $e) {
             Log::error($e->getMessage());
             return response()->json(['success' => false, 'error' => 'Database error']);

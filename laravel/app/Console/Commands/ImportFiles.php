@@ -4,32 +4,32 @@ namespace App\Console\Commands;
 
 use App\File;
 use Illuminate\Console\Command;
-use App\Services\PlacesService;
+use App\Services\ScanService;
 
-class ImportPlaces extends Command
+class ImportFiles extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'import:places';
+    protected $signature = 'import:files';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Import list of places from Google Maps KML';
+    protected $description = 'Import new files';
 
     /**
-     * @var PlacesService
+     * @var ScanService
      */
-    protected $places;
+    protected $scanService;
 
-    public function __construct(PlacesService $places)
+    public function __construct(ScanService $scanService)
     {
-        $this->places = $places;
+        $this->scanService = $scanService;
         parent::__construct();
     }
 
@@ -40,6 +40,6 @@ class ImportPlaces extends Command
      */
     public function handle()
     {
-        $this->places->import();
+        $this->scanService->scanAll();
     }
 }

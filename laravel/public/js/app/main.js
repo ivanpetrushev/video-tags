@@ -181,23 +181,25 @@ Ext.define('App.main', {
 
     getAddDirectoryWindow: function () {
         Ext.Msg.prompt('Add directory', 'Enter path relative to public/data', function (btn, val) {
-            Ext.Ajax.request({
-                url: '/directory',
-                method: 'POST',
-                jsonData: {
-                    directory: {
-                        path: val
+            if (btn == 'ok') {
+                Ext.Ajax.request({
+                    url: '/directory',
+                    method: 'POST',
+                    jsonData: {
+                        directory: {
+                            path: val
+                        }
+                    },
+                    success: function (response) {
+                        response = Ext.decode(response.responseText);
+                        if (response.success) {
+                            console.log("yay!")
+                        } else {
+                            Ext.Msg.alert('Error', response.error);
+                        }
                     }
-                },
-                success: function (response) {
-                    response = Ext.decode(response.responseText);
-                    if (response.success) {
-                        console.log("yay!")
-                    } else {
-                        Ext.Msg.alert('Error', response.error);
-                    }
-                }
-            })
+                })
+            }
         })
     }
 })
