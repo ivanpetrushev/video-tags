@@ -81,7 +81,7 @@ Ext.define('App.main', {
                             dtEnd.setSeconds(dtStart.getSeconds() + rec.duration)
 
                             dataset.push({
-                                id: i,
+                                id: rec['id'],
                                 content: rec['tag_name'],
                                 start: dtStart,
                                 end: dtEnd
@@ -91,6 +91,40 @@ Ext.define('App.main', {
                         // Create a DataSet (allows two way data-binding)
                         var items = new vis.DataSet(dataset);
                         me.timeline.setItems(items);
+
+                        items.on('remove', function (event, properties) {
+                            Ext.Ajax.request({
+                                url: '/file/remove_tag',
+                                method: 'DELETE',
+                                params: {
+                                    tag_id: properties.items[0]
+                                },
+                                success: function() {
+                                    me.getTagStore().reload();
+                                }
+                            })
+                        });
+                        items.on('update', function(event, properties) {
+                            var dt = new Date('2001-01-01 00:00:00');
+                            var dtStart = properties.data[0].start;
+                            var dtEnd = properties.data[0].end;
+                            var duration = (dtEnd.getTime() - dtStart.getTime()) / 1000;
+
+                            Ext.Ajax.request({
+                                url: '/file/save_tag',
+                                method: 'PUT',
+                                jsonData: {
+                                    tag: {
+                                        id: properties.items[0],
+                                        start_time: (dtStart.getTime() - dt.getTime()) / 1000,
+                                        duration: duration
+                                    }
+                                },
+                                success: function() {
+                                    me.getTagStore().reload();
+                                }
+                            })
+                        })
                     }
                 }
             })
@@ -197,7 +231,8 @@ Ext.define('App.main', {
                                     showCurrentTime: true,
                                     showMajorLabels: false,
                                     start: '2001-01-01 00:00:00',
-                                    end: '2001-01-01 00:00:55'
+                                    end: '2001-01-01 00:00:55',
+                                    editable: true
                                 };
 
                                 // Create a Timeline
@@ -300,13 +335,15 @@ Ext.define('App.main', {
                 tbar: [
                     {
                         xtype: 'button',
-                        iconCls: 'x-fa fa-plus color-green'
+                        iconCls: 'x-fa fa-plus color-green',
+                        tooltip: 'Add new tag'
                     }, {
                         xtype: 'button',
-                        iconCls: 'x-fa fa-copy color-blue'
-                    }, {
-                        xtype: 'button',
-                        iconCls: 'x-fa fa-times color-red'
+                        iconCls: 'x-fa fa-copy color-blue',
+                        tooltip: 'Duplicated selected tag',
+                        handler: function() {
+                            
+                        }
                     }
                 ]
             })

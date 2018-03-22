@@ -48,4 +48,34 @@ class FileController extends Controller {
 
         return response()->json(['success' => true]);
     }
+
+    public function saveTag(Request $request)
+    {
+        $id = $request->input('tag.id');
+        $oRecord = FileTag::get()->find($id);
+        if (! $oRecord) {
+            return response()->json(['success' => false, 'error' => 'Record not found']);
+        }
+
+        $aUpdateData = $request->input('tag');
+        unset($aUpdateData['id']);
+        unset($aUpdateData['created_at']);
+        unset($aUpdateData['modified_at']);
+
+        foreach ($aUpdateData as $key => $value) {
+            $oRecord->$key = $value;
+        }
+
+        try {
+            $oRecord->save();
+        } catch (\Illuminate\Database\QueryException $e) {
+            Log::error($e->getMessage());
+            return response()->json(['success' => false, 'error' => 'Database error']);
+        }
+
+        // refresh fields
+        $oRecord = FileTag::get()->find($id);
+
+        return response()->json(['success' => true, 'data' => $oRecord]);
+    }
 }
