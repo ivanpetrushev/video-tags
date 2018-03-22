@@ -54,11 +54,7 @@ Ext.define('App.main', {
                     region: 'center',
                     border: true,
                     id: 'video-container',
-                    // xtype: 'video',
-                    // url: '/data/DJI_0010.MOV',
-                    // width: 500,
-                    // controls: true
-                    html: '<video controls width="600" autoplay id="my-video" class="video-js" data-setup=\'{}\' style="margin: 0 auto; width: 600px;">' +
+                    html: '<video controls width="600" id="my-video" class="video-js" data-setup=\'{}\' style="margin: 0 auto; width: 600px;">' +
                             '<source src="/data/DJI_0010.MOV" type="video/mp4">' +
                         '</video>'
                 },
@@ -72,19 +68,41 @@ Ext.define('App.main', {
 
                             // Create a DataSet (allows two way data-binding)
                             var items = new vis.DataSet([
-                                {id: 1, content: 'Пловдив', start: '2013-04-20'},
-                                {id: 2, content: 'река', start: '2013-04-14'},
-                                {id: 3, content: 'Марица', start: '2013-04-18'},
-                                {id: 4, content: 'залез', start: '2013-04-16', end: '2013-04-19'},
-                                {id: 5, content: 'item 5', start: '2013-04-25'},
-                                {id: 6, content: 'item 6', start: '2013-04-27'}
+                                {id: 1, content: 'Пловдив', start: '2001-01-01 00:00:03'},
+                                {id: 2, content: 'река', start: '2001-01-01 00:00:15'},
+                                {id: 3, content: 'Марица', start: '2001-01-01 00:00:10'},
+                                {id: 4, content: 'залез', start: '2001-01-01 00:00:05', end: '2001-01-01 00:00:22'},
                             ]);
 
                             // Configuration for the Timeline
-                            var options = {};
+                            var options = {
+                                showCurrentTime: true,
+                                start: '2001-01-01 00:00:00',
+                                end: '2001-01-01 00:00:55:'
+                            };
 
                             // Create a Timeline
                             var timeline = new vis.Timeline(container, items, options);
+                            timeline.addCustomTime('2001-01-01 00:00:00', 't1')
+
+                            var player = videojs('my-video')
+                            player.on('timeupdate', function(e){
+                                var pos = player.currentTime();
+                                if (pos == 0) return;
+                                var dt = new Date('2001-01-01 00:00:00');
+                                var seconds = dt.getSeconds();
+                                dt.setSeconds(seconds + pos);
+                                timeline.setCustomTime(dt, 't1');
+                            })
+
+                            timeline.on('timechanged', function(e) {
+                                if (e.id == 't1') {
+                                    var dt = new Date(e.time)
+                                    var dtStart = new Date('2001-01-01 00:00:00');
+                                    var seconds = (dt.getTime() - dtStart.getTime()) / 1000;
+                                    player.currentTime(seconds);
+                                }
+                            })
                         }
                     }
                 }
