@@ -32,7 +32,8 @@ Ext.define('App.main', {
                     { name: 'fullpath', type: 'string'},
                     { name: 'path', type: 'string'},
                     { name: 'filename', type: 'string'},
-                    { name: 'duration', type: 'int'}
+                    { name: 'duration', type: 'int'},
+                    { name: 'duration_hi', type: 'string'}
                 ],
                 proxy: {
                     type: 'ajax',
@@ -96,7 +97,7 @@ Ext.define('App.main', {
                             var dtEnd = new Date('2001-01-01 00:00:00');
 
                             dtStart.setSeconds(dt.getSeconds() + rec.start_time)
-                            dtEnd.setSeconds(dtStart.getSeconds() + rec.duration)
+                            dtEnd.setSeconds(dt.getSeconds() + rec.start_time + rec.duration)
 
                             dataset.push({
                                 id: rec['id'],
@@ -169,7 +170,7 @@ Ext.define('App.main', {
                         flex: 1
                     }, {
                         text: 'Duration',
-                        dataIndex: 'duration',
+                        dataIndex: 'duration_hi',
                         width: 80
                     }
                 ],
@@ -272,7 +273,7 @@ Ext.define('App.main', {
                                     me.timeline.setCustomTime(dt, 't1');
                                 })
 
-                                me.timeline.on('timechanged', function (e) {
+                                me.timeline.on('timechange', function (e) {
                                     if (e.id == 't1') {
                                         var dt = new Date(e.time)
                                         var dtStart = new Date('2001-01-01 00:00:00');

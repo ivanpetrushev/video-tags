@@ -84,6 +84,7 @@ class FileController extends Controller {
     {
         $iFileId = $request->input('file_id');
         $iTagId = $request->input('tag_id');
+        $iStartTime = $request->input('start_time');
 
         $oTagRecord = Tag::find($iTagId);
         if (! $oTagRecord) {
@@ -96,6 +97,7 @@ class FileController extends Controller {
         $oRecord = new FileTag();
         $oRecord->file_id = $iFileId;
         $oRecord->tag_id = $iTagId;
+        $oRecord->start_time = $iStartTime;
         $oRecord->save();
 
         return response()->json(['success' => true, 'data' => $oRecord]);

@@ -138,6 +138,7 @@ class DirectoryController extends Controller
                     'leaf' => true,
                     'id' => $contents['id'],
                     'duration' => $contents['duration'],
+                    'duration_hi' => gmdate('i:s', $contents['duration']),
                     'path' => $contents['path'],
                     'fullpath' => $oDirectory['path'] . $oFile['path']
                 ];
