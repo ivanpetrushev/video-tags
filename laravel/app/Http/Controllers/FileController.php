@@ -78,4 +78,20 @@ class FileController extends Controller {
 
         return response()->json(['success' => true, 'data' => $oRecord]);
     }
+
+    public function copyTag(Request $request)
+    {
+        $id = $request->input('tag_id');
+        $oRecord = FileTag::find($id);
+        if ($oRecord) {
+            $oNewRecord = new FileTag();
+            $oNewRecord->file_id = $oRecord->file_id;
+            $oNewRecord->tag_id = $oRecord->tag_id;
+            $oNewRecord->duration = 0;
+            $oNewRecord->start_time = $request->input('start_time');
+            $oNewRecord->save();
+        }
+
+        return response()->json(['success' => true, 'data' => $oRecord]);
+    }
 }

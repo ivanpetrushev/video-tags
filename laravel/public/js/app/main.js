@@ -342,7 +342,45 @@ Ext.define('App.main', {
                         iconCls: 'x-fa fa-copy color-blue',
                         tooltip: 'Duplicated selected tag',
                         handler: function() {
-                            
+                            var selection = me.getEastPanel().getSelection();
+                            if (Ext.isEmpty(selection)) {
+                                return;
+                            }
+
+                            var player = videojs('my-video')
+                            var pos = parseInt(player.currentTime());
+
+                            Ext.Ajax.request({
+                                url: '/file/copy_tag',
+                                method: 'POST',
+                                params: {
+                                    tag_id: selection[0].data.id,
+                                    start_time: pos
+                                },
+                                success: function() {
+                                    me.getTagStore().reload();
+                                }
+                            })
+                        }
+                    }, {
+                        xtype: 'button',
+                        iconCls: 'x-fa fa-times color-red',
+                        tooltip: 'Remove selected tag',
+                        handler: function() {
+                            var selection = me.getEastPanel().getSelection();
+                            if (Ext.isEmpty(selection)) {
+                                return;
+                            }
+                            Ext.Ajax.request({
+                                url: '/file/remove_tag',
+                                method: 'DELETE',
+                                params: {
+                                    tag_id: selection[0].data.id
+                                },
+                                success: function() {
+                                    me.getTagStore().reload();
+                                }
+                            })
                         }
                     }
                 ]
