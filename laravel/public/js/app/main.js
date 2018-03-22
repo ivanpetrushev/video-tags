@@ -19,6 +19,38 @@ Ext.define('App.main', {
         win.show();
     },
 
+    getTreeStore: function() {
+        var me = this;
+        if (! me.treeStore) {
+            Ext.define('Filepath', {
+                extend: 'Ext.data.Model',
+                fields: [
+                    // { name: 'id', type: 'int'},
+                    { name: 'directory_id', type: 'int'},
+                    { name: 'path', type: 'string'},
+                    { name: 'filename', type: 'string'},
+                    { name: 'duration', type: 'int'}
+                ],
+                proxy: {
+                    type: 'ajax',
+                    api: {
+                        read: '/directory/tree'
+                    }
+                }
+            });
+
+            me.treeStore = Ext.create('Ext.data.TreeStore', {
+                model: 'Filepath',
+                root: {
+                    name: 'data',
+                    expanded: true
+                }
+            })
+
+        }
+        return me.treeStore;
+    },
+
     getWestPanel: function () {
         var me = this;
         if (!me.westPanel) {
@@ -28,27 +60,7 @@ Ext.define('App.main', {
                 border: true,
                 width: 300,
                 split: true,
-                store: Ext.create('Ext.data.TreeStore', {
-                    root: {
-                        expanded: true,
-                        children: [
-                            { text: '2018', expanded: true, children: [
-                                    { text: '2018_03_18_mavic_iztochen', expanded: true, children: [
-                                            {text: 'DJI_0006.mov', leaf: true},
-                                            {text: 'DJI_0016.mov', leaf: true},
-                                            {text: 'DJI_0018.mov', leaf: true}
-                                        ]
-                                    },
-                                    { text: '2018_03_20_mavic_marica', expanded: true, children: [
-                                            {text: 'DJI_1010.mov', leaf: true},
-                                            {text: 'DJI_1012.mov', leaf: true}
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                }),
+                store: me.getTreeStore(),
                 rootVisible: false,
                 tbar: [
                     {

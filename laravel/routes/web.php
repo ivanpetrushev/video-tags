@@ -12,9 +12,7 @@
 */
 
 Route::resource('directory', 'DirectoryController', ['only' => ['index', 'store', 'update', 'destroy']]);
-//Route::get('/directory', 'DirectoryController@listing');
-//Route::post('/directory', 'DirectoryController@add');
-//Route::delete('/directory', 'DirectoryController@delete');
+Route::get('/directory/tree', 'DirectoryController@tree');
 
 Route::get('/', function () {
     return view('welcome');

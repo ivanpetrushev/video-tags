@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\ScanService;
 use Illuminate\Http\Request;
 use App\Directory;
+use App\File;
 use DB;
 use Illuminate\Support\Facades\Log;
 use PhpParser\Node\Scalar\MagicConst\Dir;
@@ -98,5 +99,77 @@ class DirectoryController extends Controller
 
         $oRecord->delete();
         return response()->json(['success' => true, 'data' => $oRecord]);
+    }
+
+    public function tree()
+    {
+        $data = [];
+        $dirs = Directory::all();
+        foreach ($dirs as $dir) {
+            $files = File::where('directory_id', $dir->id)->get();
+            if (empty($files)) {
+                $data[] = ['text' => $dir->path, 'expanded' => true];
+            } else {
+                $arr = [];
+                foreach ($files as $file) {
+                    $arr[$file->path] = $file->path;
+                }
+                $tree = $this->explodeTree($arr, '/');
+                $children = $this->treeToChildren($tree);
+                $data[] = ['text' => $dir->path, 'expanded' => true, 'children' => $children];
+            }
+        }
+
+        return response()->json(['success' => true, 'children' => $data]);
+    }
+
+    protected function treeToChildren($tree, $indent = 0)
+    {
+        $data = [];
+
+        foreach ($tree as $dir => $contents) {
+            if (is_array($contents)) {
+                $data[] = ['text' => $dir, 'leaf' => false, 'expanded' => true, 'children' => $this->treeToChildren($contents)];
+            } else {
+                $data[] = ['text' => $dir, 'leaf' => true];
+            }
+        }
+        return $data;
+    }
+
+    protected function explodeTree($array, $delimiter = '_', $baseval = false)
+    {
+        if (!is_array($array)) return false;
+        $splitRE = '/' . preg_quote($delimiter, '/') . '/';
+        $returnArr = array();
+        foreach ($array as $key => $val) {
+            // Get parent parts and the current leaf
+            $parts = preg_split($splitRE, $key, -1, PREG_SPLIT_NO_EMPTY);
+            $leafPart = array_pop($parts);
+
+            // Build parent structure
+            // Might be slow for really deep and large structures
+            $parentArr = &$returnArr;
+            foreach ($parts as $part) {
+                if (!isset($parentArr[$part])) {
+                    $parentArr[$part] = array();
+                } elseif (!is_array($parentArr[$part])) {
+                    if ($baseval) {
+                        $parentArr[$part] = array('__base_val' => $parentArr[$part]);
+                    } else {
+                        $parentArr[$part] = array();
+                    }
+                }
+                $parentArr = &$parentArr[$part];
+            }
+
+            // Add the final part to the structure
+            if (empty($parentArr[$leafPart])) {
+                $parentArr[$leafPart] = $val;
+            } elseif ($baseval && is_array($parentArr[$leafPart])) {
+                $parentArr[$leafPart]['__base_val'] = $val;
+            }
+        }
+        return $returnArr;
     }
 }
