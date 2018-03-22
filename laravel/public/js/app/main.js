@@ -245,7 +245,57 @@ Ext.define('App.main', {
                 columns: [
                     {text: 'Tag', dataIndex: 'tag_name', flex: 1},
                     {text: 'Start', dataIndex: 'start_time_is', flex: 1},
-                    {text: 'Duration', dataIndex: 'duration_is', flex: 1}
+                    {text: 'Duration', dataIndex: 'duration_is', flex: 1},
+                    {
+                        xtype: 'actioncolumn',
+                        width: 50,
+                        items: [
+                            {
+                                iconCls: 'x-fa fa-clock-o color-blue',
+                                tooltip: 'Stop tag that is still counting',
+                                getClass: function(v, meta, rec) {
+                                    if (rec.data.duration == 0) {
+                                        return 'x-fa fa-clock-o color-blue';
+                                    }
+                                },
+                                handler: function(grid, rowIndex) {
+                                    var rec = grid.getStore().getAt(rowIndex);
+
+                                    var player = videojs('my-video')
+                                    var pos = player.currentTime();
+                                    var duration = parseInt(pos - rec.data.start_time);
+
+                                    Ext.Ajax.request({
+                                        url: '/file/stop_tag',
+                                        method: 'PUT',
+                                        params: {
+                                            tag_id: rec.data.id,
+                                            duration: duration
+                                        },
+                                        success: function() {
+                                            me.getTagStore().reload();
+                                        }
+                                    })
+                                }
+                            }, {
+                                iconCls: 'x-fa fa-times color-red',
+                                tooltip: 'Remove tag',
+                                handler: function(grid, rowIndex) {
+                                    var rec = grid.getStore().getAt(rowIndex);
+                                    Ext.Ajax.request({
+                                        url: '/file/remove_tag',
+                                        method: 'DELETE',
+                                        params: {
+                                            tag_id: rec.data.id
+                                        },
+                                        success: function() {
+                                            me.getTagStore().reload();
+                                        }
+                                    })
+                                }
+                            }
+                        ]
+                    }
                 ],
                 tbar: [
                     {

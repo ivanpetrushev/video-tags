@@ -14,6 +14,8 @@
 Route::resource('directory', 'DirectoryController', ['only' => ['index', 'store', 'update', 'destroy']]);
 Route::get('/directory/tree', 'DirectoryController@tree');
 Route::get('/file/tags', 'FileController@tags');
+Route::delete('/file/remove_tag', 'FileController@removeTag');
+Route::put('/file/stop_tag', 'FileController@stopTag');
 
 Route::get('/', function () {
     return view('welcome');

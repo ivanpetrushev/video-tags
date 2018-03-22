@@ -25,4 +25,27 @@ class FileController extends Controller {
             'data' => $data
         ]);
     }
+
+    public function removeTag(Request $request)
+    {
+        $iTagId = $request->input('tag_id');
+
+        FileTag::find($iTagId)->delete();
+
+        return response()->json(['success' => true]);
+    }
+
+    public function stopTag(Request $request)
+    {
+        $iTagId = $request->input('tag_id');
+        $iDuration = $request->input('duration');
+
+        $oRecord = FileTag::find($iTagId);
+        if ($oRecord) {
+            $oRecord->duration = $iDuration;
+            $oRecord->save();
+        }
+
+        return response()->json(['success' => true]);
+    }
 }
