@@ -66,6 +66,32 @@ Ext.define('App.main', {
                         type: 'json',
                         rootProperty: 'data'
                     }
+                },
+                listeners: {
+                    load: function(store, items) {
+                        var dataset = [];
+                        for (var i in items) {
+                            var rec = items[i].data;
+
+                            var dt = new Date('2001-01-01 00:00:00');
+                            var dtStart = new Date('2001-01-01 00:00:00');
+                            var dtEnd = new Date('2001-01-01 00:00:00');
+
+                            dtStart.setSeconds(dt.getSeconds() + rec.start_time)
+                            dtEnd.setSeconds(dtStart.getSeconds() + rec.duration)
+
+                            dataset.push({
+                                id: i,
+                                content: rec['tag_name'],
+                                start: dtStart,
+                                end: dtEnd
+                            })
+                        }
+
+                        // Create a DataSet (allows two way data-binding)
+                        var items = new vis.DataSet(dataset);
+                        me.timeline.setItems(items);
+                    }
                 }
             })
         }
@@ -153,7 +179,6 @@ Ext.define('App.main', {
                         border: true,
                         id: 'video-container',
                         html: '<video controls width="600" id="my-video" class="video-js" data-setup=\'{}\' style="margin: 0 auto; width: 600px;">' +
-                                '<source src="/data/dir2/DJI_0010.MOV" type="video/mp4">' +
                             '</video>'
                     },
                     {
@@ -165,12 +190,7 @@ Ext.define('App.main', {
                                 var container = document.getElementById('timeline-container-innerCt');
 
                                 // Create a DataSet (allows two way data-binding)
-                                var items = new vis.DataSet([
-                                    {id: 1, content: 'Пловдив', start: '2001-01-01 00:00:03'},
-                                    {id: 2, content: 'река', start: '2001-01-01 00:00:15'},
-                                    {id: 3, content: 'Марица', start: '2001-01-01 00:00:10'},
-                                    {id: 4, content: 'залез', start: '2001-01-01 00:00:05', end: '2001-01-01 00:00:22'},
-                                ]);
+                                var items = new vis.DataSet([]);
 
                                 // Configuration for the Timeline
                                 var options = {
