@@ -11,7 +11,13 @@ class TagController extends Controller
 
     public function index(Request $request)
     {
-        $data = Tag::all();
+        $query = $request->input('query');
+
+        if ($query) {
+            $data = Tag::where('name', 'like', '%'.$query.'%')->get();
+        } else {
+            $data = Tag::all();
+        }
         return response()->json([
             'success' => true,
             'data' => $data

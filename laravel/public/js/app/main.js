@@ -410,7 +410,20 @@ Ext.define('App.main', {
                             })
                         }
                     }
-                ]
+                ],
+                listeners: {
+                    itemdblclick: function(cmp, rec) {
+                        var id = rec.data.id;
+                        var start_time = rec.data.start_time;
+                        var dtStart = new Date('2001-01-01 00:00:00');
+                        dtStart.setSeconds(dtStart.getSeconds() + start_time)
+
+                        me.timeline.setSelection(id);
+
+                        var player = videojs('my-video')
+                        var pos = player.currentTime(start_time);
+                    }
+                }
             })
         }
         return me.eastPanel;
@@ -455,7 +468,13 @@ Ext.define('App.main', {
                     name: 'tag_id',
                     fieldLabel: 'Tag',
                     displayField: 'name',
-                    valueField: 'id'
+                    valueField: 'id',
+                    minChars: 1,
+                    listeners: {
+                        render: function(cmp) {
+                            cmp.focus();
+                        }
+                    }
                 }
             ],
             buttons: [
