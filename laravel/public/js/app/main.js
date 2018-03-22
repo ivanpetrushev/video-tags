@@ -58,6 +58,24 @@ Ext.define('App.main', {
         var me = this;
         if (! me.tagStore) {
             me.tagStore = Ext.create('Ext.data.Store', {
+                fields: ['id', 'name'],
+                proxy: {
+                    type: 'ajax',
+                    url: '/tag',
+                    reader: {
+                        type: 'json',
+                        rootProperty: 'data'
+                    }
+                }
+            })
+        }
+        return me.tagStore;
+    },
+
+    getFileTagStore: function() {
+        var me = this;
+        if (! me.fileTagStore) {
+            me.fileTagStore = Ext.create('Ext.data.Store', {
                 fields: ['tag_name', 'start_time', 'duration', 'start_time_is', 'duration_is'],
                 proxy: {
                     type: 'ajax',
@@ -100,7 +118,7 @@ Ext.define('App.main', {
                                     tag_id: properties.items[0]
                                 },
                                 success: function() {
-                                    me.getTagStore().reload();
+                                    me.getFileTagStore().reload();
                                 }
                             })
                         });
@@ -121,7 +139,7 @@ Ext.define('App.main', {
                                     }
                                 },
                                 success: function() {
-                                    me.getTagStore().reload();
+                                    me.getFileTagStore().reload();
                                 }
                             })
                         })
@@ -129,7 +147,7 @@ Ext.define('App.main', {
                 }
             })
         }
-        return me.tagStore;
+        return me.fileTagStore;
     },
 
     getWestPanel: function () {
@@ -139,7 +157,7 @@ Ext.define('App.main', {
                 title: 'Directories',
                 region: 'west',
                 border: true,
-                width: 300,
+                width: 400,
                 split: true,
                 store: me.getTreeStore(),
                 rootVisible: false,
@@ -173,6 +191,10 @@ Ext.define('App.main', {
                         if (Ext.isEmpty(selected)) {
                             return;
                         }
+
+                        me.getCenterPanel().enable();
+                        me.getEastPanel().enable();
+
                         rec = selected[0].data;
                         var url = '/data/' + rec.fullpath;
                         var player = videojs('my-video')
@@ -188,7 +210,7 @@ Ext.define('App.main', {
 
                         me.timeline.setWindow(dtStart, dtEnd);
 
-                        me.getTagStore().load({
+                        me.getFileTagStore().load({
                             params: {
                                 file_id: rec.id
                             }
@@ -207,6 +229,7 @@ Ext.define('App.main', {
                 title: 'Editor',
                 region: 'center',
                 layout: 'border',
+                disabled: true,
                 items: [
                     {
                         region: 'center',
@@ -217,7 +240,7 @@ Ext.define('App.main', {
                     },
                     {
                         region: 'south',
-                        height: 300,
+                        height: 200,
                         id: 'timeline-container',
                         listeners: {
                             render: function () {
@@ -275,8 +298,9 @@ Ext.define('App.main', {
                 region: 'east',
                 border: true,
                 split: true,
-                width: 300,
-                store: me.getTagStore(),
+                disabled: true,
+                width: 350,
+                store: me.getFileTagStore(),
                 columns: [
                     {text: 'Tag', dataIndex: 'tag_name', flex: 1},
                     {text: 'Start', dataIndex: 'start_time_is', flex: 1},
@@ -308,7 +332,7 @@ Ext.define('App.main', {
                                             duration: duration
                                         },
                                         success: function() {
-                                            me.getTagStore().reload();
+                                            me.getFileTagStore().reload();
                                         }
                                     })
                                 }
@@ -324,7 +348,7 @@ Ext.define('App.main', {
                                             tag_id: rec.data.id
                                         },
                                         success: function() {
-                                            me.getTagStore().reload();
+                                            me.getFileTagStore().reload();
                                         }
                                     })
                                 }
@@ -336,7 +360,10 @@ Ext.define('App.main', {
                     {
                         xtype: 'button',
                         iconCls: 'x-fa fa-plus color-green',
-                        tooltip: 'Add new tag'
+                        tooltip: 'Add new tag',
+                        handler: function() {
+                            me.getAddTagWindow();
+                        }
                     }, {
                         xtype: 'button',
                         iconCls: 'x-fa fa-copy color-blue',
@@ -358,7 +385,7 @@ Ext.define('App.main', {
                                     start_time: pos
                                 },
                                 success: function() {
-                                    me.getTagStore().reload();
+                                    me.getFileTagStore().reload();
                                 }
                             })
                         }
@@ -378,7 +405,7 @@ Ext.define('App.main', {
                                     tag_id: selection[0].data.id
                                 },
                                 success: function() {
-                                    me.getTagStore().reload();
+                                    me.getFileTagStore().reload();
                                 }
                             })
                         }
@@ -391,25 +418,85 @@ Ext.define('App.main', {
 
     getAddDirectoryWindow: function () {
         Ext.Msg.prompt('Add directory', 'Enter path relative to public/data', function (btn, val) {
-            if (btn == 'ok') {
-                Ext.Ajax.request({
-                    url: '/directory',
-                    method: 'POST',
-                    jsonData: {
-                        directory: {
-                            path: val
-                        }
-                    },
-                    success: function (response) {
-                        response = Ext.decode(response.responseText);
-                        if (response.success) {
-                            console.log("yay!")
-                        } else {
-                            Ext.Msg.alert('Error', response.error);
-                        }
-                    }
-                })
+            if (btn != 'ok') {
+                return;
             }
+            
+            Ext.Ajax.request({
+                url: '/directory',
+                method: 'POST',
+                jsonData: {
+                    directory: {
+                        path: val
+                    }
+                },
+                success: function (response) {
+                    response = Ext.decode(response.responseText);
+                    if (response.success) {
+                        console.log("yay!")
+                    } else {
+                        Ext.Msg.alert('Error', response.error);
+                    }
+                }
+            })
         })
+    },
+
+    getAddTagWindow: function() {
+        var me = this;
+
+        var form = Ext.create('Ext.form.Panel', {
+            bodyPadding: 10,
+            url: '/file/new_tag',
+            items: [
+                {
+                    xtype: 'combo',
+                    store: me.getTagStore(),
+                    name: 'tag_id',
+                    fieldLabel: 'Tag',
+                    displayField: 'name',
+                    valueField: 'id'
+                }
+            ],
+            buttons: [
+                {
+                    iconCls: 'x-fa fa-check color-green',
+                    text: 'Save',
+                    handler: function() {
+                        var selection = me.getWestPanel().getSelection();
+
+                        var player = videojs('my-video')
+                        var pos = player.currentTime();
+
+                        this.up('form').submit({
+                            params: {
+                                file_id: selection[0].data.id,
+                                start_time: pos
+                            },
+                            success: function() {
+                                me.getFileTagStore().reload();
+                                win.close();
+                            }
+                        })
+                    }
+                }, {
+                    iconCls: 'x-fa fa-ban color-red',
+                    text: 'Cancel',
+                    handler: function() {
+                        win.close();
+                    }
+                }
+            ]
+        })
+
+        var win = Ext.create('Ext.window.Window', {
+            title: 'Add tag',
+            width: 300,
+            height: 150,
+            layout: 'fit',
+            modal: true,
+            items: [form]
+        })
+        win.show();
     }
 })

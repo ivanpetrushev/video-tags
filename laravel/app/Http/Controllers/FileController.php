@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\File;
 use App\FileTag;
+use App\Tag;
 
 class FileController extends Controller {
 
@@ -75,6 +76,27 @@ class FileController extends Controller {
 
         // refresh fields
         $oRecord = FileTag::get()->find($id);
+
+        return response()->json(['success' => true, 'data' => $oRecord]);
+    }
+
+    public function newTag(Request $request)
+    {
+        $iFileId = $request->input('file_id');
+        $iTagId = $request->input('tag_id');
+
+        $oTagRecord = Tag::find($iTagId);
+        if (! $oTagRecord) {
+            $oTagRecord = new Tag();
+            $oTagRecord->name = $iTagId;
+            $oTagRecord->save();
+            $iTagId = $oTagRecord->id;
+        }
+
+        $oRecord = new FileTag();
+        $oRecord->file_id = $iFileId;
+        $oRecord->tag_id = $iTagId;
+        $oRecord->save();
 
         return response()->json(['success' => true, 'data' => $oRecord]);
     }

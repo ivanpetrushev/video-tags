@@ -8,7 +8,6 @@ use App\Directory;
 use App\File;
 use DB;
 use Illuminate\Support\Facades\Log;
-use PhpParser\Node\Scalar\MagicConst\Dir;
 
 class DirectoryController extends Controller
 {
