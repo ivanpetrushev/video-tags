@@ -188,7 +188,6 @@ Ext.define('App.main', {
                                     sReturn = sReturn / 1024;
                                     i++;
                                 } while (sReturn > 1024);
-                                console.log('val', sReturn)
 
                                 sReturn = Math.max(sReturn, 0.1).toFixed(1) + byteUnits[i];
                             }
@@ -207,7 +206,16 @@ Ext.define('App.main', {
                     },'-', {
                         xtype: 'button',
                         iconCls: 'x-fa fa-arrow-circle-up color-blue',
-                        tooltip: 'Export video tags'
+                        tooltip: 'Export video tags',
+                        handler: function () {
+                            var selection = me.getEastPanel().getSelection();
+                            if (Ext.isEmpty(selection)) {
+                                Ext.Msg.alert('Error', 'Select a video file');
+                                return;
+                            }
+
+                            window.open('/files/export/' + selection.data.id)
+                        }
                     }, {
                         xtype: 'button',
                         iconCls: 'x-fa fa-arrow-circle-down color-blue',
@@ -237,6 +245,7 @@ Ext.define('App.main', {
                         dtEnd.setSeconds(seconds + rec.duration);
 
                         me.timeline.setWindow(dtStart, dtEnd);
+                        me.timeline.setCustomTime(dtStart, 't1');
 
                         me.getFileTagStore().load({
                             params: {
@@ -329,6 +338,7 @@ Ext.define('App.main', {
                 disabled: true,
                 width: 350,
                 store: me.getFileTagStore(),
+                emptyText: 'No tags for this video',
                 columns: [
                     {text: 'Tag', dataIndex: 'tag_name', flex: 1},
                     {text: 'Start', dataIndex: 'start_time_is', flex: 1},
