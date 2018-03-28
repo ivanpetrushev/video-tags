@@ -50,6 +50,7 @@ class ScanService
                 $oRecord->path = $sRealpath;
                 $oRecord->filename = $info['basename'];
                 $oRecord->duration = (int)$id3info['playtime_seconds'];
+                $oRecord->filesize = filesize($sFilepath);
                 $oRecord->save();
                 print "Added $sFilepath\n";
             }

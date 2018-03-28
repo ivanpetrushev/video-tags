@@ -33,7 +33,8 @@ Ext.define('App.main', {
                     { name: 'path', type: 'string'},
                     { name: 'filename', type: 'string'},
                     { name: 'duration', type: 'int'},
-                    { name: 'duration_hi', type: 'string'}
+                    { name: 'duration_hi', type: 'string'},
+                    { name: 'filesize', type: 'int'}
                 ],
                 proxy: {
                     type: 'ajax',
@@ -172,6 +173,27 @@ Ext.define('App.main', {
                         text: 'Duration',
                         dataIndex: 'duration_hi',
                         width: 80
+                    }, {
+                        text: 'Size',
+                        dataIndex: 'filesize',
+                        width: 80,
+                        renderer: function(val, meta, rec) {
+                            var sReturn = '';
+
+                            if (rec.data.leaf) {
+                                sReturn = val;
+                                var i = -1;
+                                var byteUnits = [' kB', ' MB', ' GB', ' TB', 'PB', 'EB', 'ZB', 'YB'];
+                                do {
+                                    sReturn = sReturn / 1024;
+                                    i++;
+                                } while (sReturn > 1024);
+                                console.log('val', sReturn)
+
+                                sReturn = Math.max(sReturn, 0.1).toFixed(1) + byteUnits[i];
+                            }
+                            return sReturn;
+                        }
                     }
                 ],
                 tbar: [
@@ -182,9 +204,14 @@ Ext.define('App.main', {
                         handler: function () {
                             me.getAddDirectoryWindow();
                         }
+                    },'-', {
+                        xtype: 'button',
+                        iconCls: 'x-fa fa-arrow-circle-up color-blue',
+                        tooltip: 'Export video tags'
                     }, {
                         xtype: 'button',
-                        iconCls: 'x-fa fa-times color-red'
+                        iconCls: 'x-fa fa-arrow-circle-down color-blue',
+                        tooltip: 'Import video tags'
                     }
                 ],
                 listeners: {

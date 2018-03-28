@@ -22,6 +22,7 @@ class CreateBaseTables extends Migration
             $table->increments('id');
             $table->unsignedInteger('directory_id');
             $table->text('path');
+            $table->unsignedInteger('filesize')->default(0);
             $table->string('filename', 255)->default('');
             $table->integer('duration')->default(0);
 

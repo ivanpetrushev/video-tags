@@ -140,7 +140,8 @@ class DirectoryController extends Controller
                     'duration' => $contents['duration'],
                     'duration_hi' => gmdate('i:s', $contents['duration']),
                     'path' => $contents['path'],
-                    'fullpath' => $oDirectory['path'] . $oFile['path']
+                    'fullpath' => $oDirectory['path'] . $oFile['path'],
+                    'filesize' => $oFile->filesize
                 ];
             }
         }

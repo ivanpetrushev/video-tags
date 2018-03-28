@@ -20,7 +20,8 @@ services:
         tty: true
         volumes:
             - ./laravel:/var/www/laravel
-            - /home/ivanatora/snimki/:/var/www/laravel/public/data
+#            - /home/ivanatora/snimki/:/var/www/laravel/public/data
+            - /home/developer/video/:/var/www/laravel/public/data
         links:
             - db
     apache:
@@ -30,7 +31,8 @@ services:
           - 8004:80
         volumes:
           - ./laravel:/var/www/html/docroot
-          - /home/ivanatora/snimki/:/var/www/html/docroot/public/data
+#          - /home/ivanatora/snimki/:/var/www/html/docroot/public/data
+          - /home/developer/video/:/var/www/html/docroot/public/data
           - ./apache2/logs/:/var/log/apache2
           - ./apache2/sites-enabled/:/etc/apache2/sites-enabled
         links:
