@@ -20,6 +20,8 @@ Route::put('/file/stop_tag', 'FileController@stopTag');
 Route::put('/file/save_tag', 'FileController@saveTag');
 Route::post('/file/new_tag', 'FileController@newTag');
 Route::post('/file/copy_tag', 'FileController@copyTag');
+Route::get('/file/export/{id}', 'FileController@export');
+Route::post('/file/import', 'FileController@import');
 
 Route::get('/', function () {
     return view('welcome');

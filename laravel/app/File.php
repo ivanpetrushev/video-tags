@@ -14,4 +14,9 @@ class File extends Model
     {
         return $this->belongsTo('App\Directory');
     }
+
+    public function tags()
+    {
+        return $this->hasMany('App\FileTag');
+    }
 }

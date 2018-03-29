@@ -8,6 +8,100 @@ use App\Tag;
 
 class FileController extends Controller {
 
+    public function export(Request $request, $id)
+    {
+        $file = File::find($id);
+        $data = [
+            'file' => $file,
+            'tags' => []
+        ];
+
+        foreach ($file->tags as $idx => $item) {
+            $data['file']->tags[$idx]['name'] = $item->tag->name;
+        }
+
+        $data = json_encode($data);
+
+        header('Content-disposition: attachment; filename=video-' . $id . '.json');
+        header('Content-type: application/json');
+        print $data;
+        exit();
+    }
+
+    public function import(Request $request)
+    {
+        $iMaxSize = 1000000;
+        if (!isset($_FILES['json_file'])) {
+            return response()->json([
+                'success' => false,
+                'error' => 'No file uploaded'
+            ]);
+        }
+
+        if ($_FILES['json_file']['error']) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Upload error: ' . $_FILES['json_file']['error']
+            ]);
+        }
+
+        if ($_FILES['json_file']['size'] > $iMaxSize) {
+            return response()->json([
+                'success' => false,
+                'error' => 'File too big. Maximum allowed size: ' . $iMaxSize
+            ]);
+        }
+
+        try {
+            $json = json_decode(file_get_contents($_FILES['json_file']['tmp_name']), true);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'File is not a valid JSON file'
+            ]);
+        }
+
+        // try to match file by its size
+        $iUploadedSize = $json['file']['filesize'];
+        $oFile = File::where('filesize', $iUploadedSize)->first();
+        if (! $oFile) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Requested file cannot be found'
+            ]);
+        }
+
+        // file is found, clear old tag associations
+
+        FileTag::where('file_id', $oFile->id)->delete();
+
+        $iSavedTags = 0;
+
+        // assign new associations
+        foreach ($json['file']['tags'] as $aImportTag) {
+            $oTag = Tag::where('name', $aImportTag['name'])->first();
+            if (! $oTag) {
+                $oTag = new Tag();
+                $oTag->name = $aImportTag['name'];
+                $oTag->save();
+            }
+
+            $oFileTag = new FileTag();
+            $oFileTag->file_id = $oFile->id;
+            $oFileTag->tag_id = $oTag->id;
+            $oFileTag->start_time = $aImportTag['start_time'];
+            $oFileTag->duration = $aImportTag['duration'];
+            $oFileTag->save();
+            $iSavedTags++;
+        }
+
+        return response()->json([
+            'success' => true,
+            'saved_tags_cnt' => $iSavedTags,
+            'file_id' => $oFile->id
+        ]);
+    }
+
     public function tags(Request $request)
     {
         $iFileId = $request->input('file_id');

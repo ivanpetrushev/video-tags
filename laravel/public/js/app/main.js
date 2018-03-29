@@ -208,18 +208,21 @@ Ext.define('App.main', {
                         iconCls: 'x-fa fa-arrow-circle-up color-blue',
                         tooltip: 'Export video tags',
                         handler: function () {
-                            var selection = me.getEastPanel().getSelection();
+                            var selection = me.getWestPanel().getSelection();
                             if (Ext.isEmpty(selection)) {
                                 Ext.Msg.alert('Error', 'Select a video file');
                                 return;
                             }
 
-                            window.open('/files/export/' + selection.data.id)
+                            window.open('/file/export/' + selection[0].data.id)
                         }
                     }, {
                         xtype: 'button',
                         iconCls: 'x-fa fa-arrow-circle-down color-blue',
-                        tooltip: 'Import video tags'
+                        tooltip: 'Import video tags',
+                        handler: function () {
+                            me.getImportWindow();
+                        }
                     }
                 ],
                 listeners: {
@@ -550,6 +553,64 @@ Ext.define('App.main', {
             title: 'Add tag',
             width: 300,
             height: 150,
+            layout: 'fit',
+            modal: true,
+            items: [form]
+        })
+        win.show();
+    },
+
+    getImportWindow: function () {
+        var me = this;
+
+        var form = Ext.create('Ext.form.Panel', {
+            bodyPadding: 10,
+            url: '/file/import',
+            items: [
+                {
+                    xtype: 'fileuploadfield',
+                    name: 'json_file',
+                    fieldLabel: 'JSON file',
+                    anchor: '100%',
+                    labelAlign: 'top'
+                }
+            ],
+            buttons: [
+                {
+                    iconCls: 'x-fa fa-check color-green',
+                    text: 'Import',
+                    handler: function() {
+                        this.up('form').submit({
+                            success: function(form, result) {
+                                var response = result.result;
+                                if (response.success) {
+                                    Ext.Msg.alert('Done', 'Saved tags: ' + response.saved_tags_cnt);
+                                    var idx = me.getTreeStore().find('id', response.file_id);
+                                    if (idx >= 0) {
+                                        var rec = me.getTreeStore().getAt(idx);
+                                        me.getWestPanel().setSelection(rec);
+                                    }
+                                } else {
+                                    Ext.Msg.alert('Error', response.error);
+                                }
+                                win.close();
+                            }
+                        })
+                    }
+                }, {
+                    iconCls: 'x-fa fa-ban color-red',
+                    text: 'Cancel',
+                    handler: function() {
+                        win.close();
+                    }
+                }
+            ]
+        })
+
+        var win = Ext.create('Ext.window.Window', {
+            title: 'Import tags',
+            width: 300,
+            height: 180,
             layout: 'fit',
             modal: true,
             items: [form]
